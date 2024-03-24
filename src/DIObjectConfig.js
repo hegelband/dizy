@@ -2,7 +2,7 @@ const DIObjectLifecycle = {
     Persistent: 0,
     Session: 1,
     Singleton: 2,
-    Prototype: 3,
+    Promise: 3,
     Demanded: 4,
 };
 
