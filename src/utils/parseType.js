@@ -1,6 +1,7 @@
 class NotAllowedDIObjectType extends Error {
     constructor(type) {
-        this.message = `Not allowed DI object type of ${type.constructor.name}`;
+        this.name = 'Invalid DI Object type.'
+        this.message = `Not allowed DI object type of ${type.constructor.name}. DI object must be class or function.`;
         super(this.message);
     }
 }

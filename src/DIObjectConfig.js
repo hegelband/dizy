@@ -1,13 +1,13 @@
-const DIObjectLifecycle = {
+export const DIObjectLifecycle = {
     Persistent: 0,
     Session: 1,
-    Singleton: 2,
-    Promise: 3,
+    Singletone: 2,
+    Prototype: 3,
     Demanded: 4,
 };
 
 class DIObjectConfig {
-    constructor(name = '', type = {}, lifecycle = DIObjectLifecycle.Singleton) {
+    constructor(name = '', type = {}, lifecycle = DIObjectLifecycle.Session) {
         this.name = name;
         this.type = type;
         this.lifecycle = lifecycle;
