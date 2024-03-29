@@ -3,12 +3,12 @@ import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWi
 import SimpleContainer from "./SimpleContainer";
 
 class SessionContainer extends SimpleContainer {
-    constructor(parent, allClasses = []) {
-        const classWithInvalidLifecycle = allClasses.find(cls => cls.lifecycle !== DIObjectLifecycle.Session);
+    constructor(parent, classTreeList = []) {
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Session);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Session', classWithInvalidLifecycle);
         }
-        super(allClasses);
+        super(classTreeList);
         this.#parent = parent;
         this.#init();
     }
@@ -18,16 +18,16 @@ class SessionContainer extends SimpleContainer {
 
     #init() {
         // ToDo logs
-        this.allClasses.forEach(cls => {
-            if (this.#instances.has(cls.name)) {
+        this.classTreeList.forEach(cls => {
+            if (this.#instances.has(cls.baseNode.name)) {
                 return;
             }
-            this.#createInstance(cls);
+            this.#buildInstance(cls);
         });
     }
 
-    #createInstance(clazz) {
-        const instance = this._createInstance(clazz);
+    #buildInstance(clazz) {
+        const instance = this._buildInstance(clazz);
         return instance;
     }
 

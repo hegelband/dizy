@@ -1,32 +1,51 @@
 import { DIObjectLifecycle } from "../DIObjectConfig";
-import FunctionWrapper from "../wrappers/FunctionWrapper";
 import DIContainer from "./DIContainer";
+import InstanceHelper from "./helpers/InstanceHelper";
 
 class SimpleContainer extends DIContainer {
-    constructor(allClasses = []) {
-        super(allClasses);
+    constructor(classTreeList = []) {
+        super(classTreeList);
     }
 
-    _createInstance(clazz) { // create new instance and add it in Map
+    _buildInstance(clazzTree) { // create new instance and add it in Map
+        // works
+        // const groups = clazzTree.groupByHeight().reverse();
+        // for (let i = 0; i < groups.length; i++) {
+        //     for (let j = 0; j < groups[i].deps.length; j++) {
+        //         const clazz = groups[i].deps[j];
+        //         const argumentValues = [];
+        //         clazz.deps.forEach((dependency) => {
+        //             if (dependency.lifecycle !== DIObjectLifecycle.Demanded) {
+        //                 argumentValues.push(this.getInstance(dependency.name) || this.getParent().getInstance(dependency.name));
+        //             } else {
+        //                 argumentValues.push(this.getParent().getInstance(dependency.name));
+        //             }
+        //         });
+        //         if (clazz.lifecycle !== DIObjectLifecycle.Demanded) {
+        //             const instance = InstanceHelper.createInstance(groups[i].deps[j], argumentValues);
+        //             if (clazzTree.baseNode.lifecycle !== groups[i].deps[j].lifecycle) {
+        //                 this.getParent().getScope(groups[i].deps[j].lifecycle).addInstance(groups[i].deps[j].name, instance);
+        //             } else {
+        //                 this.addInstance(groups[i].deps[j].name, instance);
+        //             }
+        //         }
+        //     }
+        // }
+        // return this.getInstance(clazzTree.baseNode.name);
+
         const argumentValues = [];
-        if (clazz.constructor.args.length > 0) {
-            clazz.constructor.args.forEach((arg) => {
-                const argClazz = this.getParent().allClasses.find(cls => cls.name === arg);
-                const existedInstance = this.getInstance(argClazz.name) || this.getParent().getInstance(argClazz.name);
+        if (clazzTree.baseNode.constructor.args.length > 0) {
+            clazzTree.baseNode.constructor.args.forEach((arg) => {
+                const argClazz = this.getParent().classTreeList.find(clsTree => clsTree.baseNode.name === arg);
+                const existedInstance = this.getInstance(argClazz.baseNode.name) || this.getParent().getInstance(argClazz.baseNode.name);
                 if (existedInstance) {
                     return argumentValues.push(existedInstance);
                 }
-                argumentValues.push(this._createInstance(argClazz));
+                argumentValues.push(this._buildInstance(argClazz));
             })
         }
-        let instance;
-        if (clazz.isClass) {
-            instance = new clazz.type(...argumentValues);
-        } else {
-            instance = new FunctionWrapper(clazz.type, argumentValues);
-        }
-        console.log(clazz.name, 'new instance');
-        this.addInstance(clazz.name, instance);
+        const instance = InstanceHelper.createInstance(clazzTree.baseNode, argumentValues);
+        this.addInstance(clazzTree.baseNode.name, instance);
         return instance;
     }
 

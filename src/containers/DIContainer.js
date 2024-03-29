@@ -1,6 +1,6 @@
 class DIContainer {
-    constructor(allClasses = []) {
-        this.allClasses = allClasses;
+    constructor(classTreeList = []) {
+        this.classTreeList = classTreeList;
     }
 
 

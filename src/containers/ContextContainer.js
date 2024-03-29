@@ -5,13 +5,14 @@ import { DIObjectLifecycle } from '../DIObjectConfig.js';
 import getArgumentDefaultValue from "../utils/getArgumentDefaultValue.js";
 import DIContainer from "./DIContainer.js";
 import DIClazz from "../DIClazz.js";
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 import SessionContainer from "./SessionContainer.js";
 import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
 import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
 import HasNoDIObjectWithKey from "../errors/HasNoDIObjectWithKey.js";
 import SingletoneContainer from "./SingletoneContainer.js";
+import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
+import DemandedFactory from "./DemandedFactory.js";
 
 class ContextContainer extends DIContainer {
     constructor(config = {}, name = '', parent) {
@@ -29,17 +30,18 @@ class ContextContainer extends DIContainer {
     init() {
         if (this.#contextReady) return;
         this.#contextReady = true;
-        this.allClasses = [];
+        this.classTreeList = [];
         this.#initClasses();
         this.#validateObjectsArgsNames();
         this.#validateDependencyGraph();
-        this.allClasses.sort((a, b) => {
-            return a.constructor.args.length - b.constructor.args.length;
+        this.classTreeList.sort((a, b) => {
+            return a.baseNode.constructor.args.length - b.baseNode.constructor.args.length;
         });
         this.#initScopes();
     }
 
     #initClasses() {
+        const allConfigs = [];
         this.config.forEach(containerObject => {
             console.log(containerObject.type.toString());
             const typeOfContainerObject = parseType(containerObject.type);
@@ -61,20 +63,32 @@ class ContextContainer extends DIContainer {
                     return arg;
                 })
             };
-            this.allClasses.push(new DIClazz(
-                containerObject.name,
-                containerObject.type,
-                typeOfContainerObject === 'class',
-                containerObject.lifecycle,
-                constructor,
-            ));
+            allConfigs.push(
+                new DIClazz(
+                    containerObject.name,
+                    containerObject.type,
+                    typeOfContainerObject === 'class',
+                    containerObject.lifecycle,
+                    constructor,
+                )
+            );
             // ToDo Правила жизненных циклов
             // Построение дерева зависимостей
         });
+        allConfigs.forEach((clazz) => {
+            this.classTreeList.push(
+                DependencyTreeFactory.createDependencyTree(
+                    clazz,
+                    allConfigs
+                )
+            );
+        })
+        console.log(this.classTreeList);
+        console.log(this.classTreeList[3].groupByHeight());
     }
 
     #initScopes() {
-        const scopesTypes = new Set(this.allClasses.map(cls => cls.lifecycle));
+        const scopesTypes = new Set(this.classTreeList.map(cls => cls.baseNode.lifecycle));
         scopesTypes.forEach(lifecycle => {
             switch (lifecycle) {
                 case DIObjectLifecycle.Session:
@@ -83,6 +97,10 @@ class ContextContainer extends DIContainer {
                     break;
                 case DIObjectLifecycle.Singletone:
                     this.scopes.set(lifecycle, new SingletoneContainer(this, this.filterClassesByLifecycle(DIObjectLifecycle.Singletone)));
+                    break;
+                case DIObjectLifecycle.Demanded:
+                    this.scopes.set(lifecycle, new DemandedFactory(this, this.filterClassesByLifecycle(DIObjectLifecycle.Demanded)));
+                    break;
                 default:
                     break;
             }
@@ -96,21 +114,22 @@ class ContextContainer extends DIContainer {
     }
 
     getInstance(key, lifecycle) {
-        const findCallback = typeof key !== 'string' ? ((cls) => cls.type.name === key.name) : ((cls) => cls.name === key);
+        const findCallback = typeof key !== 'string' ? ((cls) => cls.baseNode.type.name === key.name) : ((cls) => cls.baseNode.name === key);
         let clazz;
         if (lifecycle !== undefined) {
-            clazz = [...this.allClasses].filter(cls => cls.lifecycle === lifecycle).find(findCallback);
+            clazz = [...this.classTreeList].filter(cls => cls.baseNode.lifecycle === lifecycle).find(findCallback);
         } else {
             // find first class by key in order from Persistent to Demanded
-            clazz = [...this.allClasses].sort((a, b) => a.lifecycle - b.lifecycle).find(findCallback);
+            clazz = [...this.classTreeList].sort((a, b) => a.baseNode.lifecycle - b.baseNode.lifecycle).find(findCallback);
         }
         if (!clazz) {
             throw new HasNoDIObjectWithKey(typeof key !== 'string' ? key.name : key, this.name);
         }
-        key = clazz.name;
-        const scope = this.scopes.get(clazz.lifecycle);
+        key = clazz.baseNode.name;
+        const scope = this.scopes.get(clazz.baseNode.lifecycle);
         console.log(scope);
         if (!scope) return undefined;
+        if (scope instanceof DemandedFactory) return scope.createInstance(key);
         return scope.getInstance(key);
     }
 
@@ -126,18 +145,25 @@ class ContextContainer extends DIContainer {
         return this.#parent;
     }
 
+    getScope(lifecycle) {
+        if (typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 4) {
+            return null;
+        }
+        return this.scopes.get(lifecycle);
+    }
+
     filterClassesByLifecycle(lifecycle) {
-        return this.allClasses.filter(cls => cls.lifecycle === lifecycle);
+        return this.classTreeList.filter(cls => cls.baseNode.lifecycle === lifecycle);
     }
 
     #validateObjectsArgsNames() {
         const argsSet = new Set();
-        this.allClasses.forEach((cls) => cls.constructor.args.forEach((arg) => argsSet.add({
+        this.classTreeList.forEach((cls) => cls.baseNode.constructor.args.forEach((arg) => argsSet.add({
             name: arg,
-            place: cls.name,
+            place: cls.baseNode.name,
         })));
         argsSet.forEach(arg => {
-            const cls = this.allClasses.find(elem => elem.name === arg.name);
+            const cls = this.classTreeList.find(elem => elem.baseNode.name === arg.name);
             if (cls === undefined) {
                 throw new InvalidDIObjectArgumentName(arg.place, arg.name);
             }
@@ -145,21 +171,21 @@ class ContextContainer extends DIContainer {
     }
 
     #validateDependencyGraph() {
-        this.allClasses.forEach((cls) => {
-            cls.constructor.args.forEach(arg => {
-                this.#findDependencyLoop([cls.name, arg], arg);
+        this.classTreeList.forEach((cls) => {
+            cls.baseNode.constructor.args.forEach(arg => {
+                this.#findDependencyLoop([cls.baseNode.name, arg], arg);
             });
         });
         return true;
     }
 
     #findDependencyLoop(depsList = [], argName) {
-        if (this.allClasses.length === 0) return;
-        if (argName === undefined) argName = this.allClasses[0].name;
-        const cls = this.allClasses.find(cls => cls.name === argName);
-        cls.constructor.args.forEach(elem => {
+        if (this.classTreeList.length === 0) return;
+        if (argName === undefined) argName = this.classTreeList[0].baseNode.name;
+        const cls = this.classTreeList.find(cls => cls.baseNode.name === argName);
+        cls.baseNode.constructor.args.forEach(elem => {
             if (depsList.includes(elem)) {
-                throw new DependencyLoopError(cls.name, elem);
+                throw new DependencyLoopError(cls.baseNode.name, elem);
             } else {
                 this.#findDependencyLoop([...depsList, elem], elem);
             }

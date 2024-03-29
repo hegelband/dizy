@@ -4,20 +4,20 @@ import HasNoDIObjectWithKey from "../errors/HasNoDIObjectWithKey";
 import SimpleContainer from "./SimpleContainer";
 
 class SingletoneContainer extends SimpleContainer {
-    constructor(parent, allClasses = []) {
-        const classWithInvalidLifecycle = allClasses.find(cls => cls.lifecycle !== DIObjectLifecycle.Singletone);
+    constructor(parent, classTreeList = []) {
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Singletone);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Singletone', classWithInvalidLifecycle);
         }
-        super(allClasses);
+        super(classTreeList);
         this.#parent = parent;
     }
 
     #parent;
     #instances = new Map();
 
-    #createInstance(clazz) {
-        const instance = this._createInstance(clazz);
+    #buildInstance(clazz) {
+        const instance = this._buildInstance(clazz);
         return instance;
     }
 
@@ -30,11 +30,11 @@ class SingletoneContainer extends SimpleContainer {
         if (existed) {
             return existed;
         }
-        const clazz = this.allClasses.find(cls => cls.name === key);
+        const clazz = this.classTreeList.find(cls => cls.baseNode.name === key);
         if (!clazz) {
             return undefined;
         }
-        return this.#createInstance(clazz);
+        return this.#buildInstance(clazz);
     }
 
     getParent() {

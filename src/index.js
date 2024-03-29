@@ -9,7 +9,7 @@ import square from './modules/square.js';
 import rectangle from './modules/rectangle.js';
 
 const DIConfig = [
-    new DIObjectConfig('animal', Animal),
+    new DIObjectConfig('animal', Animal, DIObjectLifecycle.Demanded),
     new DIObjectConfig('woman', Woman),
     new DIObjectConfig('man', Man),
     new DIObjectConfig('simple', Simple, DIObjectLifecycle.Singletone),
@@ -22,11 +22,13 @@ const DIConfig = [
 const appContext = new ContextContainer(DIConfig, 'App Context');
 appContext.init();
 
-const sss = appContext.getInstance(Simple);
+const simpleObj = appContext.getInstance(Simple);
+const manObg = appContext.getInstance(Man);
 
 appContext.getInstance(Simple);
 
-console.log('This is Simple singletone from AppContext ', sss);
+console.log('This is Simple singletone from AppContext ', simpleObj);
+console.log('This is Man session from AppContext ', manObg);
 
 // const testPromise = new Promise((resolve, reject) => {
 //     setTimeout(() => resolve(5), 1000);
