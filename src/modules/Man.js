@@ -1,5 +1,3 @@
-import Animal from './Animal.js';
-
 class Man {
     constructor(animal) {
         // console.log('man with ', animal);

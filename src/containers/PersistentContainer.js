@@ -1,21 +1,31 @@
 import { DIObjectLifecycle } from "../DIObjectConfig";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
-import deepEqual from "../utils/deepEqual";
 import SimpleContainer from "./SimpleContainer";
 import InstancesMap from "./helpers/InstancesMap";
 
-class SingletoneContainer extends SimpleContainer {
+class PersistentContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
-        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Singletone);
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Session);
         if (classWithInvalidLifecycle) {
-            throw new ContainerHasClassWithInvalidLifecycle('Singletone', classWithInvalidLifecycle);
+            throw new ContainerHasClassWithInvalidLifecycle('Session', classWithInvalidLifecycle);
         }
         super(classTreeList);
         this.#parent = parent;
+        this.#init();
     }
 
     #parent;
     #instances = new InstancesMap();
+
+    #init() {
+        // ToDo logs
+        this.classTreeList.forEach(cls => {
+            if (this.#instances.hasBySymbol(cls.baseNode.key.key)) {
+                return;
+            }
+            this.#buildInstance(cls);
+        });
+    }
 
     #buildInstance(clazz) {
         const instance = this._buildInstance(clazz);
@@ -27,15 +37,7 @@ class SingletoneContainer extends SimpleContainer {
     }
 
     getInstance(key) {
-        const existed = this.#instances.getBySymbol(key.key);
-        if (existed) {
-            return existed;
-        }
-        const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
-        if (!clazz) {
-            return undefined;
-        }
-        return this.#buildInstance(clazz);
+        return this.#instances.getBySymbol(key.key);
     }
 
     getParent() {
@@ -43,5 +45,4 @@ class SingletoneContainer extends SimpleContainer {
     }
 }
 
-export default SingletoneContainer;
-
+export default PersistentContainer;

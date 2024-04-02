@@ -2,6 +2,7 @@ import DIClazz from "../DIClazz";
 
 class DependencyTreeNode extends DIClazz {
     constructor({
+        key,
         name,
         type,
         isClass,
@@ -10,7 +11,7 @@ class DependencyTreeNode extends DIClazz {
         height,
         deps
     }) {
-        super(name, type, isClass, lifecycle, constructor);
+        super(key, name, type, isClass, lifecycle, constructor);
         this.height = height;
         this.deps = deps;
     }

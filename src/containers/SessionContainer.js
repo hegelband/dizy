@@ -1,6 +1,7 @@
 import { DIObjectLifecycle } from "../DIObjectConfig";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
 import SimpleContainer from "./SimpleContainer";
+import InstancesMap from "./helpers/InstancesMap";
 
 class SessionContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
@@ -14,12 +15,12 @@ class SessionContainer extends SimpleContainer {
     }
 
     #parent;
-    #instances = new Map();
+    #instances = new InstancesMap();
 
     #init() {
         // ToDo logs
         this.classTreeList.forEach(cls => {
-            if (this.#instances.has(cls.baseNode.name)) {
+            if (this.#instances.hasBySymbol(cls.baseNode.key.key)) {
                 return;
             }
             this.#buildInstance(cls);
@@ -32,11 +33,11 @@ class SessionContainer extends SimpleContainer {
     }
 
     addInstance(key, instance) {
-        this.#instances.set(key, instance);
+        this.#instances.set(key.key, instance);
     }
 
     getInstance(key) {
-        return this.#instances.get(key);
+        return this.#instances.getBySymbol(key.key);
     }
 
     getParent() {

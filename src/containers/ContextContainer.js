@@ -13,23 +13,50 @@ import HasNoDIObjectWithKey from "../errors/HasNoDIObjectWithKey.js";
 import SingletoneContainer from "./SingletoneContainer.js";
 import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
 import DemandedFactory from "./DemandedFactory.js";
+import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
+
+class DIObjectHasInvalidName extends Error {
+    constructor(name, contextName) {
+        const message = `DI Object has invalid name { ${name} }. Rename this DI object in ${contextName} context config.`;
+        super(message);
+        this.name = "DI Object's name is invalid";
+    }
+}
+
+class DIObjectHasInvalidLifecycleIdentifier extends Error {
+    constructor(lifecycleId, contextName) {
+        const message = `DI Object has invalid lifecycle identifier { ${lifecycleId} }. Change this DI object in ${contextName} context config.`;
+        super(message);
+        this.name = "DI Object's lifecycle identifier is invalid";
+    }
+}
+
+class DIConfigHasObjectsWithRepeatedNames extends Error {
+    constructor(names, contextName) {
+        const message = `There are DI objects with the same names { ${names.join(', ')} } in ${contextName} context config.`;
+        super(message);
+        this.name = "DI Config has objects with repeated names";
+    }
+}
 
 class ContextContainer extends DIContainer {
-    constructor(config = {}, name = '', parent) {
+    constructor(config = [], name = '', parent, keyFactory = new DIObjectKeyFactory()) {
         super([]);
         this.config = config;
         this.name = name;
         this.#parent = parent;
+        this.#keyFactory = keyFactory;
     }
 
     #contextReady = false;
     #parent;
+    #keyFactory;
 
     scopes = new Map();
 
     init() {
+        this.#validateDIConfig();
         if (this.#contextReady) return;
-        this.#contextReady = true;
         this.classTreeList = [];
         this.#initClasses();
         this.#validateObjectsArgsNames();
@@ -38,6 +65,7 @@ class ContextContainer extends DIContainer {
             return a.baseNode.constructor.args.length - b.baseNode.constructor.args.length;
         });
         this.#initScopes();
+        this.#contextReady = true;
     }
 
     #initClasses() {
@@ -45,6 +73,7 @@ class ContextContainer extends DIContainer {
         this.config.forEach(containerObject => {
             console.log(containerObject.type.toString());
             const typeOfContainerObject = parseType(containerObject.type);
+            const isClass = typeOfContainerObject === 'class';
             const containerObjectTypeStr = containerObject.type.toString();
             const constructorArgs = typeOfContainerObject === 'class'
                 ? getClassConstructorArgsNames(containerObjectTypeStr)
@@ -65,9 +94,10 @@ class ContextContainer extends DIContainer {
             };
             allConfigs.push(
                 new DIClazz(
+                    this.#keyFactory.createKey(this, containerObject.name, containerObject.lifecycle, isClass),
                     containerObject.name,
                     containerObject.type,
-                    typeOfContainerObject === 'class',
+                    isClass,
                     containerObject.lifecycle,
                     constructor,
                 )
@@ -82,7 +112,7 @@ class ContextContainer extends DIContainer {
                     allConfigs
                 )
             );
-        })
+        });
         console.log(this.classTreeList);
         console.log(this.classTreeList[3].groupByHeight());
     }
@@ -107,14 +137,25 @@ class ContextContainer extends DIContainer {
         });
     }
 
-    hasInstance(key, lifecycle) {
-        if (lifecycle !== undefined) {
-
-        }
+    hasInstance(name, lifecycle) {
+        const classTree = this.#findClassTree(name, lifecycle);
+        const scope = this.scopes.get(classTree.baseNode.lifecycle);
+        if (classTree.baseNode.lifecycle === DIObjectLifecycle.Demanded) return false;
+        if (scope.getInstance(classTree.baseNode.key)) return true;
     }
 
-    getInstance(key, lifecycle) {
-        const findCallback = typeof key !== 'string' ? ((cls) => cls.baseNode.type.name === key.name) : ((cls) => cls.baseNode.name === key);
+    getInstance(name, lifecycle) {
+        const clazz = this.#findClassTree(name, lifecycle);
+        const key = clazz.baseNode.key;
+        const scope = this.scopes.get(clazz.baseNode.lifecycle);
+        console.log(scope);
+        if (!scope) return undefined;
+        if (scope instanceof DemandedFactory) return scope.createInstance(key);
+        return scope.getInstance(key);
+    }
+
+    #findClassTree(name, lifecycle) {
+        const findCallback = typeof name !== 'string' ? ((cls) => cls.baseNode.type.name === name.name) : ((cls) => cls.baseNode.name === name);
         let clazz;
         if (lifecycle !== undefined) {
             clazz = [...this.classTreeList].filter(cls => cls.baseNode.lifecycle === lifecycle).find(findCallback);
@@ -123,14 +164,9 @@ class ContextContainer extends DIContainer {
             clazz = [...this.classTreeList].sort((a, b) => a.baseNode.lifecycle - b.baseNode.lifecycle).find(findCallback);
         }
         if (!clazz) {
-            throw new HasNoDIObjectWithKey(typeof key !== 'string' ? key.name : key, this.name);
+            throw new HasNoDIObjectWithKey(typeof name !== 'string' ? name.name : name, this.name);
         }
-        key = clazz.baseNode.name;
-        const scope = this.scopes.get(clazz.baseNode.lifecycle);
-        console.log(scope);
-        if (!scope) return undefined;
-        if (scope instanceof DemandedFactory) return scope.createInstance(key);
-        return scope.getInstance(key);
+        return clazz;
     }
 
     filterInstances(callback) {
@@ -146,7 +182,7 @@ class ContextContainer extends DIContainer {
     }
 
     getScope(lifecycle) {
-        if (typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 4) {
+        if (typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 3) {
             return null;
         }
         return this.scopes.get(lifecycle);
@@ -154,6 +190,32 @@ class ContextContainer extends DIContainer {
 
     filterClassesByLifecycle(lifecycle) {
         return this.classTreeList.filter(cls => cls.baseNode.lifecycle === lifecycle);
+    }
+
+    #validateDIConfig() {
+        // Check if there are objects with invalid name
+        // !name !== true || typeof name === 'string'
+        const objectWithInvalidName = this.config.find(({ name }) => !name === true || typeof name !== 'string');
+        if (objectWithInvalidName) {
+            throw new DIObjectHasInvalidName(objectWithInvalidName.name, this.name);
+        }
+        // Accept repeated names *
+        // Check if there are objects with the same names
+        const configSet = new Set(this.config.map((objectConfig) => objectConfig.name));
+        if (this.config.length !== configSet.size) {
+            const objectsByNames = Object.fromEntries(Array.from(configSet.values()).map(key => ([
+                key,
+                this.config.filter((objectConfig) => objectConfig.name === key),
+            ])));
+            const objectsWithRepeatedNames = Object.entries(objectsByNames).filter(([name, items]) => items.length > 1);
+            throw new DIConfigHasObjectsWithRepeatedNames(objectsWithRepeatedNames.map(obj => obj[0]), this.name);
+        }
+        // Check object lifecycle
+        // Change this conditions after Lifecycle class will be defined.
+        const objectWithInvalidLifecycle = this.config.find(({ lifecycle }) => typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 3);
+        if (objectWithInvalidLifecycle) {
+            throw new DIObjectHasInvalidLifecycleIdentifier(objectWithInvalidLifecycle.lifecycle, this.name);
+        }
     }
 
     #validateObjectsArgsNames() {

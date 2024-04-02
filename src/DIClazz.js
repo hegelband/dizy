@@ -1,5 +1,6 @@
 class DIClazz {
-    constructor(name, type, isClass, lifecycle, constructor) {
+    constructor(key, name, type, isClass, lifecycle, constructor) {
+        this.key = key;
         this.name = name;
         this.type = type;
         this.isClass = isClass;
