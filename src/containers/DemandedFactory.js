@@ -21,12 +21,12 @@ class DemandedFactory {
             clazzTree.baseNode.constructor.args.forEach((arg) => {
                 const argClazz = this.getParent().classTreeList.find(clsTree => clsTree.baseNode.name === arg);
                 const existedInstance = argClazz.baseNode.lifecycle !== DIObjectLifecycle.Demanded
-                    ? this.getParent().getInstance(argClazz.baseNode.key)
+                    ? this.getParent().getInstance(argClazz.baseNode.name)
                     : undefined;
                 if (existedInstance) {
                     return argumentValues.push(existedInstance);
                 }
-                argumentValues.push(this.createInstance(argClazz));
+                argumentValues.push(this.createInstance(argClazz.baseNode.key));
             })
         }
         const instance = InstanceHelper.createInstance(clazzTree.baseNode, argumentValues);
@@ -35,6 +35,7 @@ class DemandedFactory {
     }
 
     createInstance(key) { // create new instance and add it in Map
+        console.log(key);
         const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
         if (!clazz) {
             return undefined;

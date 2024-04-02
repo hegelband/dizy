@@ -113,8 +113,6 @@ class ContextContainer extends DIContainer {
                 )
             );
         });
-        console.log(this.classTreeList);
-        console.log(this.classTreeList[3].groupByHeight());
     }
 
     #initScopes() {

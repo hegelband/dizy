@@ -7,28 +7,47 @@ import dot from './modules/dot.js';
 import line from './modules/line.js';
 import square from './modules/square.js';
 import rectangle from './modules/rectangle.js';
+import Window from './modules/Window.js';
+import { SideBar } from './modules/Window.js';
+import Button from './modules/Button.js';
 
 const DIConfig = [
-    new DIObjectConfig('animal', Animal, DIObjectLifecycle.Demanded),
-    new DIObjectConfig('woman', Woman),
-    new DIObjectConfig('man', Man),
-    new DIObjectConfig('simple', Simple, DIObjectLifecycle.Singletone),
-    new DIObjectConfig('dot', dot),
-    new DIObjectConfig('line', line),
-    new DIObjectConfig('square', square),
-    new DIObjectConfig('rectangle', rectangle),
+    new DIObjectConfig('window', Window, DIObjectLifecycle.Demanded),
+    new DIObjectConfig('sideBar', SideBar, DIObjectLifecycle.Demanded),
+    new DIObjectConfig('button', Button, DIObjectLifecycle.Demanded),
 ];
 
-const appContext = new ContextContainer(DIConfig, 'App Context');
+const appContext = new ContextContainer(DIConfig, 'app context');
+
 appContext.init();
+appContext.getInstance();
+appContext.getInstance(Window);
+// appContext.getInstance(Window);
+// appContext.getInstance(Window);
+// appContext.getInstance(Window);
+// appContext.getInstance('window');
 
-const simpleObj = appContext.getInstance(Simple);
-const manObg = appContext.getInstance(Man);
+// const DIConfig = [
+//     new DIObjectConfig('animal', Animal, DIObjectLifecycle.Demanded),
+//     new DIObjectConfig('woman', Woman),
+//     new DIObjectConfig('man', Man),
+//     new DIObjectConfig('simple', Simple, DIObjectLifecycle.Singletone),
+//     new DIObjectConfig('dot', dot),
+//     new DIObjectConfig('line', line),
+//     new DIObjectConfig('square', square),
+//     new DIObjectConfig('rectangle', rectangle),
+// ];
 
-appContext.getInstance(Simple);
+// const appContext = new ContextContainer(DIConfig, 'App Context');
+// appContext.init();
 
-console.log('This is Simple singletone from AppContext ', simpleObj);
-console.log('This is Man session from AppContext ', manObg);
+// const simpleObj = appContext.getInstance(Simple);
+// const manObg = appContext.getInstance(Man);
+
+// appContext.getInstance(Simple);
+
+// console.log('This is Simple singletone from AppContext ', simpleObj);
+// console.log('This is Man session from AppContext ', manObg);
 
 // const testPromise = new Promise((resolve, reject) => {
 //     setTimeout(() => resolve(5), 1000);
