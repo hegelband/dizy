@@ -37,7 +37,7 @@ class SimpleContainer extends DIContainer {
         if (clazzTree.baseNode.constructor.args.length > 0) {
             clazzTree.baseNode.constructor.args.forEach((arg) => {
                 const argClazz = this.getParent().classTreeList.find(clsTree => clsTree.baseNode.name === arg);
-                const existedInstance = this.getInstance(argClazz.baseNode.key) || this.getParent().getInstance(argClazz.baseNode.key);
+                const existedInstance = this.getInstance(argClazz.baseNode.key) || this.getParent().getInstance(argClazz.baseNode.name);
                 if (existedInstance) {
                     return argumentValues.push(existedInstance);
                 }
