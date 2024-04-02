@@ -36,7 +36,8 @@ class DemandedFactory {
 
     createInstance(key) { // create new instance and add it in Map
         console.log(key);
-        const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
+        // const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
+        const clazz = this.classTreeList.find(cls => cls.baseNode.key.key === key.key);
         if (!clazz) {
             return undefined;
         }

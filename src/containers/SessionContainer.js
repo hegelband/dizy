@@ -20,7 +20,10 @@ class SessionContainer extends SimpleContainer {
     #init() {
         // ToDo logs
         this.classTreeList.forEach(cls => {
-            if (this.#instances.hasBySymbol(cls.baseNode.key.key)) {
+            // if (this.#instances.hasBySymbol(cls.baseNode.key.key)) {
+            //     return;
+            // }
+            if (this.#instances.has(cls.baseNode.key.key)) {
                 return;
             }
             this.#buildInstance(cls);
@@ -37,7 +40,8 @@ class SessionContainer extends SimpleContainer {
     }
 
     getInstance(key) {
-        return this.#instances.getBySymbol(key.key);
+        // return this.#instances.getBySymbol(key.key);
+        return this.#instances.get(key.key);
     }
 
     getParent() {

@@ -40,7 +40,7 @@ class SimpleContainer extends DIContainer {
                 const existedInstance = this.getInstance(argClazz.baseNode.key)
                     || (
                         argClazz.baseNode.lifecycle === DIObjectLifecycle.Demanded
-                            ? this.getParent().getInstance(argClazz.baseNode.key)
+                            ? this.getParent().getInstance(argClazz.baseNode.name)
                             : this.getParent().getInstance(argClazz.baseNode.name)
                     );
                 if (existedInstance) {

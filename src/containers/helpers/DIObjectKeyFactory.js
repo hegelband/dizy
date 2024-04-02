@@ -1,5 +1,5 @@
 import { InvalidDIObjectLifecycle, InvalidDIObjectName, InvalidDIObjectParent } from "../../DIObjectConfig";
-import deepEqual from "../../utils/deepEqual";
+// import deepEqual from "../../utils/deepEqual";
 import ContextContainer from "../ContextContainer";
 import DIObjectKey from "./DIObjectKey";
 
@@ -30,17 +30,24 @@ class DIObjectKeyFactory {
             name,
             lifecycle,
             isClass
-        }
+        };
+        const keyDescriptionStr = this.#stringifyKeyDescription(keyDescription);
         let keyExisted = null;
         this.#keys.forEach((objectKey) => {
-            if (deepEqual(Symbol.keyFor(objectKey.key), keyDescription)) {
-                keyExisted = value;
-            }
+            // if (deepEqual(Symbol.keyFor(objectKey.key), keyDescription)) {
+            //     keyExisted = value;
+            // }
+            if (objectKey === keyDescriptionStr) keyExisted = true;
         });
         if (keyExisted) throw new NotUniqueDIObjectKey(keyDescription);
-        const key = new DIObjectKey(Symbol.for(`@${keyDescription.parent?.name}/${keyDescription.name}/${keyDescription.lifecycle}/${keyDescription.isClass}`));
+        // const key = new DIObjectKey(Symbol.for(keyDescriptionStr));
+        const key = new DIObjectKey(keyDescriptionStr);
         this.#keys.add(key);
         return key;
+    }
+
+    #stringifyKeyDescription({ parent, name, lifecycle, isClass }) {
+        return `@${parent?.name}/${name}/${lifecycle}/${isClass}`;
     }
 
     #validateKeyParams(parent, name, lifecycle, isClass) {
@@ -58,3 +65,4 @@ class DIObjectKeyFactory {
 }
 
 export default DIObjectKeyFactory;
+

@@ -13,14 +13,14 @@ import Button from './modules/Button.js';
 
 const DIConfig = [
     new DIObjectConfig('window', Window, DIObjectLifecycle.Demanded),
-    new DIObjectConfig('sideBar', SideBar, DIObjectLifecycle.Demanded),
-    new DIObjectConfig('button', Button, DIObjectLifecycle.Demanded),
+    new DIObjectConfig('sideBar', SideBar, DIObjectLifecycle.Singletone),
+    new DIObjectConfig('button', Button, DIObjectLifecycle.Session),
 ];
 
 const appContext = new ContextContainer(DIConfig, 'app context');
 
 appContext.init();
-appContext.getInstance();
+appContext.getInstance(Window);
 appContext.getInstance(Window);
 // appContext.getInstance(Window);
 // appContext.getInstance(Window);

@@ -27,11 +27,13 @@ class SingletoneContainer extends SimpleContainer {
     }
 
     getInstance(key) {
-        const existed = this.#instances.getBySymbol(key.key);
+        // const existed = this.#instances.getBySymbol(key.key);
+        const existed = this.#instances.get(key.key);
         if (existed) {
             return existed;
         }
-        const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
+        // const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
+        const clazz = this.classTreeList.find(cls => cls.baseNode.key.key === key.key);
         if (!clazz) {
             return undefined;
         }
