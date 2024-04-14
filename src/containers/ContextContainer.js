@@ -1,8 +1,4 @@
-import getClassConstructorArgsNames from "../utils/getClassConstructorArgsNames.js";
-import getFunctionArgsNames from "../utils/getFunctionArgsNames.js";
-import parseType from "../utils/parseType.js";
 import { DIObjectLifecycle } from '../DIObjectConfig.js';
-import getArgumentDefaultValue from "../utils/getArgumentDefaultValue.js";
 import DIContainer from "./DIContainer.js";
 import DIClazz from "../DIClazz.js";
 import SessionContainer from "./SessionContainer.js";
@@ -15,6 +11,7 @@ import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
 import DemandedFactory from "./DemandedFactory.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import PersistentContainer from "./PersistentContainer.js";
+import { getArgumentDefaultValue, getClassConstructorArgsNames, getFunctionArgsNames, parseType } from "../../ReflectionJs";
 
 class DIObjectHasInvalidName extends Error {
     constructor(name, contextName) {
