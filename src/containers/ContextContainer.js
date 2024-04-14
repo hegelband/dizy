@@ -14,6 +14,7 @@ import SingletoneContainer from "./SingletoneContainer.js";
 import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
 import DemandedFactory from "./DemandedFactory.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
+import PersistentContainer from "./PersistentContainer.js";
 
 class DIObjectHasInvalidName extends Error {
     constructor(name, contextName) {
@@ -72,6 +73,7 @@ class ContextContainer extends DIContainer {
         const allConfigs = [];
         this.config.forEach(containerObject => {
             console.log(containerObject.type.toString());
+            const objName = typeof containerObject.name === 'symbol' ? Symbol.keyFor(containerObject.name) : containerObject.name;
             const typeOfContainerObject = parseType(containerObject.type);
             const isClass = typeOfContainerObject === 'class';
             const containerObjectTypeStr = containerObject.type.toString();
@@ -87,15 +89,15 @@ class ContextContainer extends DIContainer {
                         if (!obj) {
                             throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
                         }
-                        return obj.name;
+                        return typeof obj.name === 'symbol' ? Symbol.keyFor(obj.name) : obj.name;
                     }
                     return arg;
                 })
             };
             allConfigs.push(
                 new DIClazz(
-                    this.#keyFactory.createKey(this, containerObject.name, containerObject.lifecycle, isClass),
-                    containerObject.name,
+                    this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
+                    objName,
                     containerObject.type,
                     isClass,
                     containerObject.lifecycle,
@@ -106,6 +108,7 @@ class ContextContainer extends DIContainer {
             // Построение дерева зависимостей
         });
         allConfigs.forEach((clazz) => {
+            // console.log(clazz.name);
             this.classTreeList.push(
                 DependencyTreeFactory.createDependencyTree(
                     clazz,
@@ -116,14 +119,20 @@ class ContextContainer extends DIContainer {
     }
 
     #initScopes() {
-        const scopesTypes = new Set(this.classTreeList.map(cls => cls.baseNode.lifecycle));
+        // sort scopes initialization order by desc of lifecycle id (order: Demanded -> Singletone -> Session -> Persistent)
+        const scopesTypes = new Set(this.classTreeList.map(cls => cls.baseNode.lifecycle).sort((a, b) => b - a));
         scopesTypes.forEach(lifecycle => {
             switch (lifecycle) {
+                // case DIObjectLifecycle.Persistent:
+                //     this.scopes.set(lifecycle, new PersistentContainer(this, this.filterClassesByLifecycle(DIObjectLifecycle.Persistent)));
+                //     console.log(this.scopes);
+                //     break;
                 case DIObjectLifecycle.Session:
                     this.scopes.set(lifecycle, new SessionContainer(this, this.filterClassesByLifecycle(DIObjectLifecycle.Session)));
-                    console.log(this.scopes);
+                    // console.log(this.scopes);
                     break;
                 case DIObjectLifecycle.Singletone:
+                    console.log('done');
                     this.scopes.set(lifecycle, new SingletoneContainer(this, this.filterClassesByLifecycle(DIObjectLifecycle.Singletone)));
                     break;
                 case DIObjectLifecycle.Demanded:
@@ -144,6 +153,7 @@ class ContextContainer extends DIContainer {
 
     getInstance(name, lifecycle) {
         const clazz = this.#findClassTree(name, lifecycle);
+        console.log(clazz.baseNode.name, clazz.baseNode.lifecycle);
         const key = clazz.baseNode.key;
         const scope = this.scopes.get(clazz.baseNode.lifecycle);
         console.log(scope);
@@ -153,7 +163,18 @@ class ContextContainer extends DIContainer {
     }
 
     #findClassTree(name, lifecycle) {
-        const findCallback = typeof name !== 'string' ? ((cls) => cls.baseNode.type.name === name.name) : ((cls) => cls.baseNode.name === name);
+        let findCallback;
+        switch (typeof name) {
+            case 'string':
+                findCallback = ((cls) => cls.baseNode.name === name);
+                break;
+            case 'symbol':
+                findCallback = ((cls) => cls.baseNode.name === Symbol.keyFor(name));
+                break;
+            default:
+                findCallback = ((cls) => cls.baseNode.type.name === name.name);
+                break;
+        }
         let clazz;
         if (lifecycle !== undefined) {
             clazz = [...this.classTreeList].filter(cls => cls.baseNode.lifecycle === lifecycle).find(findCallback);
@@ -193,21 +214,21 @@ class ContextContainer extends DIContainer {
     #validateDIConfig() {
         // Check if there are objects with invalid name
         // !name !== true || typeof name === 'string'
-        const objectWithInvalidName = this.config.find(({ name }) => !name === true || typeof name !== 'string');
+        const objectWithInvalidName = this.config.find(({ name }) => !name === true || !(typeof name === 'string' || typeof name === 'symbol'));
         if (objectWithInvalidName) {
             throw new DIObjectHasInvalidName(objectWithInvalidName.name, this.name);
         }
         // Accept repeated names *
         // Check if there are objects with the same names
-        const configSet = new Set(this.config.map((objectConfig) => objectConfig.name));
-        if (this.config.length !== configSet.size) {
-            const objectsByNames = Object.fromEntries(Array.from(configSet.values()).map(key => ([
-                key,
-                this.config.filter((objectConfig) => objectConfig.name === key),
-            ])));
-            const objectsWithRepeatedNames = Object.entries(objectsByNames).filter(([name, items]) => items.length > 1);
-            throw new DIConfigHasObjectsWithRepeatedNames(objectsWithRepeatedNames.map(obj => obj[0]), this.name);
-        }
+        // const configSet = new Set(this.config.map((objectConfig) => objectConfig.name));
+        // if (this.config.length !== configSet.size) {
+        //     const objectsByNames = Object.fromEntries(Array.from(configSet.values()).map(key => ([
+        //         key,
+        //         this.config.filter((objectConfig) => objectConfig.name === key),
+        //     ])));
+        //     const objectsWithRepeatedNames = Object.entries(objectsByNames).filter(([name, items]) => items.length > 1);
+        //     throw new DIConfigHasObjectsWithRepeatedNames(objectsWithRepeatedNames.map(obj => obj[0]), this.name);
+        // }
         // Check object lifecycle
         // Change this conditions after Lifecycle class will be defined.
         const objectWithInvalidLifecycle = this.config.find(({ lifecycle }) => typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 3);

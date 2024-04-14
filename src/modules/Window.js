@@ -10,6 +10,8 @@ class Window {
         this.sideBar = xyz;
         console.log('Window create with sidebar ' + xyz);
     }
+
+    done() { }
 }
 
 export default Window;

@@ -27,6 +27,7 @@ class SingletoneContainer extends SimpleContainer {
     }
 
     getInstance(key) {
+        console.log('key');
         // const existed = this.#instances.getBySymbol(key.key);
         const existed = this.#instances.get(key.key);
         if (existed) {
@@ -35,6 +36,7 @@ class SingletoneContainer extends SimpleContainer {
         // const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
         const clazz = this.classTreeList.find(cls => cls.baseNode.key.key === key.key);
         if (!clazz) {
+            console.log('nonono')
             return undefined;
         }
         return this.#buildInstance(clazz);

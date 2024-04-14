@@ -11,21 +11,24 @@ import Window from './modules/Window.js';
 import { SideBar } from './modules/Window.js';
 import Button from './modules/Button.js';
 
+const names = {
+    windowName: Symbol.for('window'),
+    sideBarName: Symbol.for('sideBar'),
+    buttonName: Symbol.for('button'),
+};
+
 const DIConfig = [
-    new DIObjectConfig('window', Window, DIObjectLifecycle.Demanded),
-    new DIObjectConfig('sideBar', SideBar, DIObjectLifecycle.Singletone),
-    new DIObjectConfig('button', Button, DIObjectLifecycle.Session),
+    new DIObjectConfig(names.windowName, Window, DIObjectLifecycle.Demanded),
+    // new DIObjectConfig('window', Animal, DIObjectLifecycle.Demanded),
+    new DIObjectConfig(names.sideBarName, SideBar, DIObjectLifecycle.Singletone),
+    new DIObjectConfig(names.buttonName, Button, DIObjectLifecycle.Session),
 ];
 
 const appContext = new ContextContainer(DIConfig, 'app context');
 
 appContext.init();
-appContext.getInstance(Window);
-appContext.getInstance(Window);
-// appContext.getInstance(Window);
-// appContext.getInstance(Window);
-// appContext.getInstance(Window);
-// appContext.getInstance('window');
+appContext.getInstance(names.windowName);
+const w = appContext.getInstance(Window);
 
 // const DIConfig = [
 //     new DIObjectConfig('animal', Animal, DIObjectLifecycle.Demanded),

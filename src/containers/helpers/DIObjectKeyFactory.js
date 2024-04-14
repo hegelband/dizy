@@ -5,7 +5,7 @@ import DIObjectKey from "./DIObjectKey";
 
 class NotUniqueDIObjectKey extends Error {
     constructor({ parent, name, lifecycle, isClass }) {
-        const message = `DI key with {
+        const message = `DI key with description {
             parent: ${parent ? parent.name : 'null'},
             name: ${name},
             lifecycle: ${lifecycle},
@@ -29,15 +29,18 @@ class DIObjectKeyFactory {
             parent,
             name,
             lifecycle,
-            isClass
+            isClass,
         };
         const keyDescriptionStr = this.#stringifyKeyDescription(keyDescription);
         let keyExisted = null;
         this.#keys.forEach((objectKey) => {
-            // if (deepEqual(Symbol.keyFor(objectKey.key), keyDescription)) {
-            //     keyExisted = value;
+            // if (typeof objectKey.key === 'symbol') {
+            //     if (deepEqual(Symbol.keyFor(objectKey.key), keyDescription)) {
+            //         keyExisted = true;
+            //     }
+            // } else {
+            if (objectKey.key === keyDescriptionStr) keyExisted = true;
             // }
-            if (objectKey === keyDescriptionStr) keyExisted = true;
         });
         if (keyExisted) throw new NotUniqueDIObjectKey(keyDescription);
         // const key = new DIObjectKey(Symbol.for(keyDescriptionStr));
@@ -54,7 +57,7 @@ class DIObjectKeyFactory {
         if (parent && !(parent instanceof ContextContainer)) {
             throw new InvalidDIObjectParent();
         }
-        if (typeof name !== 'string' || !name === true) {
+        if (!(typeof name === 'string' || typeof name === 'symbol') || !name === true) {
             throw new InvalidDIObjectName(name);
         }
         if (typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 3) {
