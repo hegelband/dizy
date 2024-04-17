@@ -1,42 +1,49 @@
-import { DIObjectLifecycle } from "../DIObjectConfig";
+import LifecycleEnum from "../constants/LifecycleEnum";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
 import SimpleContainer from "./SimpleContainer";
+import InstancesMap from "./helpers/InstancesMap";
 
 class SessionContainer extends SimpleContainer {
-    constructor(parent, allClasses = []) {
-        const classWithInvalidLifecycle = allClasses.find(cls => cls.lifecycle !== DIObjectLifecycle.Session);
+    constructor(parent, classTreeList = []) {
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Session);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Session', classWithInvalidLifecycle);
         }
-        super(allClasses);
+        super(classTreeList);
         this.#parent = parent;
-        this.#init();
+        // this.#init();
     }
 
     #parent;
-    #instances = new Map();
+    #instances = new InstancesMap();
 
-    #init() {
+    init() {
         // ToDo logs
-        this.allClasses.forEach(cls => {
-            if (this.#instances.has(cls.name)) {
+        this.classTreeList.forEach(cls => {
+            // if (this.#instances.hasBySymbol(cls.baseNode.key.key)) {
+            //     return;
+            // }
+            if (this.#instances.has(cls.baseNode.key.key)) {
                 return;
             }
-            this.#createInstance(cls);
+            this.#buildInstance(cls);
         });
     }
 
-    #createInstance(clazz) {
-        const instance = this._createInstance(clazz);
+    #buildInstance(clazz) {
+        clazz.baseNode.lifecycle.beforeCreate();
+        const instance = this._buildInstance(clazz);
+        clazz.baseNode.lifecycle.afterCreate.bind(instance)();
         return instance;
     }
 
     addInstance(key, instance) {
-        this.#instances.set(key, instance);
+        this.#instances.set(key.key, instance);
     }
 
     getInstance(key) {
-        return this.#instances.get(key);
+        // return this.#instances.getBySymbol(key.key);
+        return this.#instances.get(key.key);
     }
 
     getParent() {

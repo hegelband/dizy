@@ -6,8 +6,8 @@ class NotImplementedException extends Error {
 }
 
 class Lifecycle {
-    constructor() {
-
+    constructor(id) {
+        this.id = id;
     }
 
     beforeCreate() {
