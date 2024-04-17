@@ -1,4 +1,4 @@
-import { DIObjectLifecycle } from "../DIObjectConfig";
+import LifecycleEnum from "../constants/LifecycleEnum";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
 import deepEqual from "../utils/deepEqual";
 import SimpleContainer from "./SimpleContainer";
@@ -6,7 +6,7 @@ import InstancesMap from "./helpers/InstancesMap";
 
 class SingletoneContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
-        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Singletone);
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Singletone);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Singletone', classWithInvalidLifecycle);
         }
@@ -18,7 +18,9 @@ class SingletoneContainer extends SimpleContainer {
     #instances = new InstancesMap();
 
     #buildInstance(clazz) {
+        clazz.baseNode.lifecycle.beforeCreate();
         const instance = this._buildInstance(clazz);
+        clazz.baseNode.lifecycle.afterCreate.bind(instance)();
         return instance;
     }
 

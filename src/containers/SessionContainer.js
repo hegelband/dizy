@@ -1,23 +1,23 @@
-import { DIObjectLifecycle } from "../DIObjectConfig";
+import LifecycleEnum from "../constants/LifecycleEnum";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
 import SimpleContainer from "./SimpleContainer";
 import InstancesMap from "./helpers/InstancesMap";
 
 class SessionContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
-        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Session);
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Session);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Session', classWithInvalidLifecycle);
         }
         super(classTreeList);
         this.#parent = parent;
-        this.#init();
+        // this.#init();
     }
 
     #parent;
     #instances = new InstancesMap();
 
-    #init() {
+    init() {
         // ToDo logs
         this.classTreeList.forEach(cls => {
             // if (this.#instances.hasBySymbol(cls.baseNode.key.key)) {
@@ -31,7 +31,9 @@ class SessionContainer extends SimpleContainer {
     }
 
     #buildInstance(clazz) {
+        clazz.baseNode.lifecycle.beforeCreate();
         const instance = this._buildInstance(clazz);
+        clazz.baseNode.lifecycle.afterCreate.bind(instance)();
         return instance;
     }
 

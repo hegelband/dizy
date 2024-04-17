@@ -8,7 +8,7 @@ class NotUniqueDIObjectKey extends Error {
         const message = `DI key with description {
             parent: ${parent ? parent.name : 'null'},
             name: ${name},
-            lifecycle: ${lifecycle},
+            lifecycle: ${lifecycle.id},
             isClass: ${isClass}
         } isn't unique. There is another DI object with this key.`;
         super(message);
@@ -50,7 +50,7 @@ class DIObjectKeyFactory {
     }
 
     #stringifyKeyDescription({ parent, name, lifecycle, isClass }) {
-        return `@${parent?.name}/${name}/${lifecycle}/${isClass}`;
+        return `@${parent?.name}/${name}/${lifecycle.id}/${isClass}`;
     }
 
     #validateKeyParams(parent, name, lifecycle, isClass) {
@@ -60,7 +60,7 @@ class DIObjectKeyFactory {
         if (!(typeof name === 'string' || typeof name === 'symbol') || !name === true) {
             throw new InvalidDIObjectName(name);
         }
-        if (typeof lifecycle !== 'number' || lifecycle < 0 || lifecycle > 3) {
+        if (typeof lifecycle.id !== 'number' || lifecycle.id < 0 || lifecycle.id > 3) {
             throw new InvalidDIObjectLifecycle(lifecycle);
         }
         return true;

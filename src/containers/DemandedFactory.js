@@ -1,11 +1,11 @@
-import { DIObjectLifecycle } from "../DIObjectConfig";
+import LifecycleEnum from "../constants/LifecycleEnum";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
 import deepEqual from "../utils/deepEqual";
 import InstanceHelper from "./helpers/InstanceHelper";
 
 class DemandedFactory {
     constructor(parent, classTreeList = []) {
-        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Demanded);
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Demanded);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Demanded', classWithInvalidLifecycle);
         }
@@ -20,7 +20,7 @@ class DemandedFactory {
         if (clazzTree.baseNode.constructor.args.length > 0) {
             clazzTree.baseNode.constructor.args.forEach((arg) => {
                 const argClazz = this.getParent().classTreeList.find(clsTree => clsTree.baseNode.name === arg);
-                const existedInstance = argClazz.baseNode.lifecycle !== DIObjectLifecycle.Demanded
+                const existedInstance = argClazz.baseNode.lifecycle.id !== LifecycleEnum.Demanded
                     ? this.getParent().getInstance(argClazz.baseNode.name)
                     : undefined;
                 if (existedInstance) {
@@ -29,7 +29,9 @@ class DemandedFactory {
                 argumentValues.push(this.createInstance(argClazz.baseNode.key));
             })
         }
+        clazzTree.baseNode.lifecycle.beforeCreate();
         const instance = InstanceHelper.createInstance(clazzTree.baseNode, argumentValues);
+        clazzTree.baseNode.lifecycle.afterCreate.bind(instance)();
         console.log(clazzTree.baseNode.name, 'new instance');
         return instance;
     }

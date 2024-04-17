@@ -1,4 +1,4 @@
-import { DIObjectLifecycle } from "../DIObjectConfig";
+import LifecycleEnum from "../constants/LifecycleEnum";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
 import SimpleContainer from "./SimpleContainer";
 import InstancesMap from "./helpers/InstancesMap";
@@ -6,7 +6,7 @@ import PersistentInstanceProxyFactory from './helpers/PersistentInstanceProxyFac
 
 class PersistentContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
-        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle !== DIObjectLifecycle.Persistent);
+        const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Persistent);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Persistent', classWithInvalidLifecycle);
         }

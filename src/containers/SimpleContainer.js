@@ -1,4 +1,3 @@
-import { DIObjectLifecycle } from "../DIObjectConfig";
 import DIContainer from "./DIContainer";
 import InstanceHelper from "./helpers/InstanceHelper";
 
@@ -15,16 +14,16 @@ class SimpleContainer extends DIContainer {
         //         const clazz = groups[i].deps[j];
         //         const argumentValues = [];
         //         clazz.deps.forEach((dependency) => {
-        //             if (dependency.lifecycle !== DIObjectLifecycle.Demanded) {
+        //             if (dependency.lifecycle.id !== LifecycleEnum.Demanded) {
         //                 argumentValues.push(this.getInstance(dependency.name) || this.getParent().getInstance(dependency.name));
         //             } else {
         //                 argumentValues.push(this.getParent().getInstance(dependency.name));
         //             }
         //         });
-        //         if (clazz.lifecycle !== DIObjectLifecycle.Demanded) {
+        //         if (clazz.lifecycle.id !== LifecycleEnum.Demanded) {
         //             const instance = InstanceHelper.createInstance(groups[i].deps[j], argumentValues);
-        //             if (clazzTree.baseNode.lifecycle !== groups[i].deps[j].lifecycle) {
-        //                 this.getParent().getScope(groups[i].deps[j].lifecycle).addInstance(groups[i].deps[j].name, instance);
+        //             if (clazzTree.baseNode.lifecycle.id !== groups[i].deps[j].lifecycle) {
+        //                 this.getParent().getScope(groups[i].deps[j].lifecycle.id).addInstance(groups[i].deps[j].name, instance);
         //             } else {
         //                 this.addInstance(groups[i].deps[j].name, instance);
         //             }

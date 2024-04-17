@@ -1,27 +1,36 @@
-import Animal from './modules/Animal.js';
-import Man, { Simple } from './modules/Man.js';
-import Woman from './modules/Woman.js';
-import DIObjectConfig, { DIObjectLifecycle } from './DIObjectConfig.js';
+import { DemandedConfig, SessionConfig, SingletoneConfig } from './DIObjectConfig.js';
 import ContextContainer from './containers/ContextContainer.js';
-import dot from './modules/dot.js';
-import line from './modules/line.js';
-import square from './modules/square.js';
-import rectangle from './modules/rectangle.js';
-import Window from './modules/Window.js';
-import { SideBar } from './modules/Window.js';
+import Window, { AbstractWindow } from './modules/Window.js';
+// import { SideBar } from './modules/Window.js';
 import Button from './modules/Button.js';
+import SideBar from './modules/SideBar.js';
+import rectangle from './modules/rectangle.js';
 
 const names = {
     windowName: Symbol.for('window'),
     sideBarName: Symbol.for('sideBar'),
-    buttonName: Symbol.for('button'),
+    buttonName: 'button',
+    rectangleName: 'rectangle',
 };
 
 const DIConfig = [
-    new DIObjectConfig(names.windowName, Window, DIObjectLifecycle.Demanded),
-    // new DIObjectConfig('window', Animal, DIObjectLifecycle.Demanded),
-    new DIObjectConfig(names.sideBarName, SideBar, DIObjectLifecycle.Singletone),
-    new DIObjectConfig(names.buttonName, Button, DIObjectLifecycle.Session),
+    new DemandedConfig(
+        'abstractWindow',
+        AbstractWindow
+    ),
+    new DemandedConfig(
+        names.windowName,
+        Window,
+        function () {
+            console.log(10);
+        },
+        function () {
+            console.log(this.sideBar.button.width);
+        }
+    ),
+    new SingletoneConfig(names.sideBarName, SideBar),
+    new SessionConfig(names.rectangleName, rectangle),
+    new SessionConfig(names.buttonName, Button),
 ];
 
 const appContext = new ContextContainer(DIConfig, 'app context');
@@ -29,12 +38,13 @@ const appContext = new ContextContainer(DIConfig, 'app context');
 appContext.init();
 appContext.getInstance(names.windowName);
 const w = appContext.getInstance(Window);
+const aw = appContext.getInstance(AbstractWindow);
 
 // const DIConfig = [
-//     new DIObjectConfig('animal', Animal, DIObjectLifecycle.Demanded),
+//     new DIObjectConfig('animal', Animal, LifecycleEnum.Demanded),
 //     new DIObjectConfig('woman', Woman),
 //     new DIObjectConfig('man', Man),
-//     new DIObjectConfig('simple', Simple, DIObjectLifecycle.Singletone),
+//     new DIObjectConfig('simple', Simple, LifecycleEnum.Singletone),
 //     new DIObjectConfig('dot', dot),
 //     new DIObjectConfig('line', line),
 //     new DIObjectConfig('square', square),

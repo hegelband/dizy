@@ -1,4 +1,4 @@
-const rectangle = function Re(square) {
+const rectangle = button => {
     // console.log('Func rectangle with square ', square);
 };
 
