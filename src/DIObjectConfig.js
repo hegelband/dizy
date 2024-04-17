@@ -1,4 +1,3 @@
-import LifecycleEnum from "./constants/LifecycleEnum";
 import DemandedLifecycle from "./lifecycle/DemandedLifecycle";
 import SessionLifecycle from "./lifecycle/SessionLifecycle";
 import SingletoneLifecycle from "./lifecycle/SingletoneLifecycle";
