@@ -8,6 +8,7 @@ import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import { getArgumentDefaultValue, getBaseClass, getClassConstructorArgsNames, getFunctionArgsNames, parseType } from "../../ReflectionJs";
 import Lifecycle from "../lifecycle/Lifecycle.js";
+import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
 
 class DIObjectHasInvalidName extends Error {
     constructor(name, contextName) {
@@ -80,16 +81,17 @@ class AbstractContextContainer extends DIContainer {
             console.log(containerObject.type.toString());
             const objName = typeof containerObject.name === 'symbol' ? Symbol.keyFor(containerObject.name) : containerObject.name;
             const typeOfContainerObject = parseType(containerObject.type);
+            if (typeOfContainerObject !== 'class' && typeOfContainerObject !== 'function') throw new NotAllowedDIObjectType(containerObject.type);
             const isClass = typeOfContainerObject === 'class';
-            const containerObjectTypeStr = containerObject.type.toString();
             const constructorArgs = typeOfContainerObject === 'class'
-                ? getClassConstructorArgsNames(containerObjectTypeStr)
-                : getFunctionArgsNames(containerObjectTypeStr);
+                ? getClassConstructorArgsNames(containerObject.type)
+                : getFunctionArgsNames(containerObject.type);
             const constructor = {
                 ...constructorArgs,
                 args: constructorArgs.args.map((arg) => {
                     const defaultValue = getArgumentDefaultValue(arg);
-                    if (defaultValue) {
+                    if (defaultValue && defaultValue.value) {
+                        console.log(defaultValue);
                         const obj = this.config.find(cls => cls.type.name === defaultValue.value);
                         if (!obj) {
                             throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
@@ -99,7 +101,6 @@ class AbstractContextContainer extends DIContainer {
                     return arg;
                 })
             };
-            console.log(constructor);
             allConfigs.push(
                 new DIClazz(
                     this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
@@ -239,8 +240,8 @@ class AbstractContextContainer extends DIContainer {
         console.log(clazz.name, baseClass.name, isAnotherDIObject)
         if (baseClass.name !== 'Object') {
             if (isAnotherDIObject) {
-                const clsConstructorArgs = getClassConstructorArgsNames(clazz.toString()).args;
-                const baseClsConstructorArgs = getClassConstructorArgsNames(baseClass.toString()).args;
+                const clsConstructorArgs = getClassConstructorArgsNames(clazz).args;
+                const baseClsConstructorArgs = getClassConstructorArgsNames(baseClass).args;
                 if (clsConstructorArgs.length < baseClsConstructorArgs.length) {
                     throw new DerivedClassConstructorArgsError(clazz.name, baseClass.name);
                 }
