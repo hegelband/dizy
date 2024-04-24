@@ -5,16 +5,16 @@
 //     }
 // }
 
-import sss from "./SideBar";
+import SideBar from "./SideBar.js";
 
 export class AbstractWindow {
-    constructor(xyz = sss) {
+    constructor(xyz = SideBar) {
         this.sideBar = xyz;
     }
 }
 
 class Window extends AbstractWindow {
-    constructor(xxx = sss) {
+    constructor(xxx = SideBar) {
         super(xxx);
         // comment
         console.log('Window create with sidebar ' + xxx);

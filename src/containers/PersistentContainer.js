@@ -1,8 +1,8 @@
-import LifecycleEnum from "../constants/LifecycleEnum";
-import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
-import SimpleContainer from "./SimpleContainer";
-import InstancesMap from "./helpers/InstancesMap";
-import PersistentInstanceProxyFactory from './helpers/PersistentInstanceProxyFactory';
+import LifecycleEnum from "../constants/LifecycleEnum.js";
+import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
+import SimpleContainer from "./SimpleContainer.js";
+import InstancesMap from "./helpers/InstancesMap.js";
+import PersistentInstanceProxyFactory from './helpers/PersistentInstanceProxyFactory.js';
 
 class PersistentContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {

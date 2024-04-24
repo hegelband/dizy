@@ -1,22 +1,38 @@
 {
-  "name": "didi-try",
+  "name": "dizy",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --mode development --config webpack.js"
+    "start": "webpack serve --mode development --config webpack.cjs"
   },
   "author": "",
+  "keywords": [
+    "dizy",
+    "di",
+    "dijs",
+    "dependency injection"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kelian9/dizy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kelian9/dizy/issues"
+  },
   "license": "ISC",
   "dependencies": {
     "acorn": "^8.11.3",
     "babel-loader": "^9.1.3",
+    "chai": "^5.1.0",
     "clean-webpack-plugin": "^4.0.0",
     "express": "^4.19.1",
     "fs": "^0.0.1-security",
     "html-webpack-plugin": "^5.6.0",
     "http": "^0.0.1-security",
+    "mocha": "^10.4.0",
     "vite": "^5.2.6",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",

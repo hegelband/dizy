@@ -6,7 +6,7 @@ class FunctionWrapper {
     }
 
     call() {
-        this.func(...args);
+        return this.func(...this.args);
     }
 }
 

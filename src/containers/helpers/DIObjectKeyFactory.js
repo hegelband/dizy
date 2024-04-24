@@ -1,7 +1,8 @@
-import { InvalidDIObjectLifecycle, InvalidDIObjectName, InvalidDIObjectParent } from "../../DIObjectConfig";
+import { InvalidDIObjectLifecycle, InvalidDIObjectName, InvalidDIObjectParent } from "../../DIObjectConfig.js";
+import LifecycleEnum from "../../constants/LifecycleEnum.js";
 // import deepEqual from "../../utils/deepEqual";
-import ContextContainer from "../ContextContainer";
-import DIObjectKey from "./DIObjectKey";
+import ContextContainer from "../ContextContainer.js";
+import DIObjectKey from "./DIObjectKey.js";
 
 class NotUniqueDIObjectKey extends Error {
     constructor({ parent, name, lifecycle, isClass }) {
@@ -60,7 +61,7 @@ class DIObjectKeyFactory {
         if (!(typeof name === 'string' || typeof name === 'symbol') || !name === true) {
             throw new InvalidDIObjectName(name);
         }
-        if (typeof lifecycle.id !== 'number' || lifecycle.id < 0 || lifecycle.id > 3) {
+        if (typeof lifecycle.id !== 'number' || lifecycle.id < LifecycleEnum.Persistent || lifecycle.id > LifecycleEnum.Demanded) {
             throw new InvalidDIObjectLifecycle(lifecycle);
         }
         return true;

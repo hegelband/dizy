@@ -1,7 +1,6 @@
-import LifecycleEnum from "./constants/LifecycleEnum";
-import DemandedLifecycle from "./lifecycle/DemandedLifecycle";
-import SessionLifecycle from "./lifecycle/SessionLifecycle";
-import SingletoneLifecycle from "./lifecycle/SingletoneLifecycle";
+import DemandedLifecycle from "./lifecycle/DemandedLifecycle.js";
+import SessionLifecycle from "./lifecycle/SessionLifecycle.js";
+import SingletoneLifecycle from "./lifecycle/SingletoneLifecycle.js";
 
 export class InvalidDIObjectName extends Error {
     constructor(name) {

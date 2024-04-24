@@ -1,7 +1,7 @@
-import LifecycleEnum from "../constants/LifecycleEnum";
-import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
-import SimpleContainer from "./SimpleContainer";
-import InstancesMap from "./helpers/InstancesMap";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
+import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
+import SimpleContainer from "./SimpleContainer.js";
+import InstancesMap from "./helpers/InstancesMap.js";
 
 class SessionContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {

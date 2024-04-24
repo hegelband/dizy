@@ -1,5 +1,22 @@
+import { parseType } from "../../../ReflectionJs/index.js";
+
+class InvalidKey extends Error {
+    constructor(key) {
+        super(`
+            DIObjectKey constructor argument ('key' = ${key.toString()} (type - ${parseType(key)})) is invalid.
+            Argument 'key' must be a string like '@\${parentName}/\${DIObjectName}/\${lifecycleId}/\${isClass}'
+        `);
+    }
+}
+
 class DIObjectKey {
     constructor(key) {
+        if (typeof key !== 'string') {
+            throw new InvalidKey(key);
+        }
+        if (!/@[\w\s]+\/[\w\s]+\/[\d]+\/true/.test(key) && !/@[\w\s]+\/[\w\s]+\/[\d]+\/false/.test(key)) {
+            throw new InvalidKey(key);
+        }
         this.key = key;
     }
 

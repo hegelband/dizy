@@ -1,7 +1,7 @@
-import LifecycleEnum from "../constants/LifecycleEnum";
-import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
-import deepEqual from "../utils/deepEqual";
-import InstanceHelper from "./helpers/InstanceHelper";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
+import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
+import deepEqual from "../utils/deepEqual.js";
+import InstanceHelper from "./helpers/InstanceHelper.js";
 
 class DemandedFactory {
     constructor(parent, classTreeList = []) {

@@ -14,10 +14,10 @@ const names = {
 };
 
 const DIConfig = [
-    new DemandedConfig(
-        'abstractWindow',
-        AbstractWindow
-    ),
+    // new DemandedConfig(
+    //     'abstractWindow',
+    //     AbstractWindow
+    // ),
     new DemandedConfig(
         names.windowName,
         Window,
@@ -38,7 +38,8 @@ const appContext = new ContextContainer(DIConfig, 'app context');
 appContext.init();
 appContext.getInstance(names.windowName);
 const w = appContext.getInstance(Window);
-const aw = appContext.getInstance(AbstractWindow);
+// console.log(appContext.typeMatch(names.windowName, Window));
+// const aw = appContext.getInstance(AbstractWindow);
 
 // const DIConfig = [
 //     new DIObjectConfig('animal', Animal, LifecycleEnum.Demanded),

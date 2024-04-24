@@ -1,4 +1,4 @@
-import FunctionWrapper from "../../wrappers/FunctionWrapper";
+import FunctionWrapper from "../../wrappers/FunctionWrapper.js";
 
 class InstanceHelper {
     static createInstance(clazzTreeNode, argumentValues) {

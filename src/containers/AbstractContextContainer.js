@@ -6,9 +6,10 @@ import DependencyLoopError from "../errors/DependencyLoopError.js";
 import HasNoDIObjectWithKey from "../errors/HasNoDIObjectWithKey.js";
 import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
-import { getArgumentDefaultValue, getBaseClass, getClassConstructorArgsNames, getFunctionArgsNames, parseType } from "../../ReflectionJs";
+import { getArgumentDefaultValue, getBaseClass, getClassConstructorArgsNames, getFunctionArgsNames, parseType } from "../../ReflectionJs/index.js";
 import Lifecycle from "../lifecycle/Lifecycle.js";
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
 
 class DIObjectHasInvalidName extends Error {
     constructor(name, contextName) {
@@ -26,13 +27,13 @@ class DIObjectHasInvalidLifecycleIdentifier extends Error {
     }
 }
 
-class DIConfigHasObjectsWithRepeatedNames extends Error {
-    constructor(names, contextName) {
-        const message = `There are DI objects with the same names { ${names.join(', ')} } in ${contextName} context config.`;
-        super(message);
-        this.name = "DI Config has objects with repeated names";
-    }
-}
+// class DIConfigHasObjectsWithRepeatedNames extends Error {
+//     constructor(names, contextName) {
+//         const message = `There are DI objects with the same names { ${names.join(', ')} } in ${contextName} context config.`;
+//         super(message);
+//         this.name = "DI Config has objects with repeated names";
+//     }
+// }
 
 class DerivedClassConstructorArgsError extends Error {
     constructor(derivedClassName, baseClassName) {
@@ -94,6 +95,7 @@ class AbstractContextContainer extends DIContainer {
                         console.log(defaultValue);
                         const obj = this.config.find(cls => cls.type.name === defaultValue.value);
                         if (!obj) {
+                            console.log(containerObject)
                             throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
                         }
                         return typeof obj.name === 'symbol' ? Symbol.keyFor(obj.name) : obj.name;
@@ -166,10 +168,6 @@ class AbstractContextContainer extends DIContainer {
         return clazz;
     }
 
-    filterInstances(callback) {
-        // Returns DI objects that meet the condition specified in a callback function.
-    }
-
     typeMatch(key, type) {
         // is DI object with key instance of type
     }
@@ -206,12 +204,16 @@ class AbstractContextContainer extends DIContainer {
         // }
         // Check object lifecycle
         // Change this conditions after Lifecycle class will be defined.
-        const objectWithInvalidLifecycle = this.config.find(({ lifecycle }) => !(lifecycle instanceof Lifecycle) || lifecycle.id < 0 || lifecycle.id > 3);
+        const objectWithInvalidLifecycle = this.config.find(({ lifecycle }) => {
+            return !(lifecycle instanceof Lifecycle)
+                || lifecycle.id < LifecycleEnum.Persistent
+                || lifecycle.id > LifecycleEnum.Demanded;
+        });
         if (objectWithInvalidLifecycle) {
             throw new DIObjectHasInvalidLifecycleIdentifier(objectWithInvalidLifecycle.lifecycle.id, this.name);
         }
         // Check Inheritance Hierarchy
-        this.config.forEach((clazz) => this.#validateInheritanceHierarchy(clazz.type));
+        // this.config.forEach((clazz) => this.#validateInheritanceHierarchy(clazz.type));
     }
 
     #validateObjectsArgsNames() {

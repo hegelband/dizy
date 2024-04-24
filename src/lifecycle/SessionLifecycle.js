@@ -1,5 +1,5 @@
-import Lifecycle from "./Lifecycle";
-import LifecycleEnum from "../constants/LifecycleEnum";
+import Lifecycle from "./Lifecycle.js";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
 
 class SessionLifecycle extends Lifecycle {
     constructor(beforeCreate = () => { }, afterCreate = () => { }) {

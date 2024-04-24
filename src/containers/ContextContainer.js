@@ -60,25 +60,21 @@ class ContextContainer extends AbstractContextContainer {
 
     getInstance(name, lifecycleId) {
         const clazz = this._findClassTree(name, lifecycleId);
-        console.log(clazz.baseNode.name, clazz.baseNode.lifecycle.id);
         const key = clazz.baseNode.key;
         const scope = this.getScope(clazz.baseNode.lifecycle.id);
-        console.log(scope);
         if (!scope) return undefined;
         if (scope instanceof DemandedFactory) return scope.createInstance(key);
         return scope.getInstance(key);
     }
 
-    filterInstances(callback) {
-        // Returns DI objects that meet the condition specified in a callback function.
-    }
-
-    typeMatch(key, type) {
-        // is DI object with key instance of type
+    typeMatch(name, type) {
+        // is DI object with name instance of type
+        const clazz = this._findClassTree(name);
+        return clazz.baseNode.type === type;
     }
 
     getScope(lifecycleId) {
-        if (typeof lifecycleId !== 'number' || lifecycleId < 0 || lifecycleId > 3) {
+        if (typeof lifecycleId !== 'number' || lifecycleId < LifecycleEnum.Persistent || lifecycleId > LifecycleEnum.Demanded) {
             return null;
         }
         return this.scopes.get(lifecycleId);

@@ -1,5 +1,6 @@
-import DIContainer from "./DIContainer";
-import InstanceHelper from "./helpers/InstanceHelper";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
+import DIContainer from "./DIContainer.js";
+import InstanceHelper from "./helpers/InstanceHelper.js";
 
 class SimpleContainer extends DIContainer {
     constructor(classTreeList = []) {
@@ -22,10 +23,10 @@ class SimpleContainer extends DIContainer {
         //         });
         //         if (clazz.lifecycle.id !== LifecycleEnum.Demanded) {
         //             const instance = InstanceHelper.createInstance(groups[i].deps[j], argumentValues);
-        //             if (clazzTree.baseNode.lifecycle.id !== groups[i].deps[j].lifecycle) {
-        //                 this.getParent().getScope(groups[i].deps[j].lifecycle.id).addInstance(groups[i].deps[j].name, instance);
+        //             if (clazzTree.baseNode.lifecycle.id !== groups[i].deps[j].lifecycle.id) {
+        //                 this.getParent().getScope(groups[i].deps[j].lifecycle.id).addInstance(groups[i].deps[j].key, instance);
         //             } else {
-        //                 this.addInstance(groups[i].deps[j].name, instance);
+        //                 this.addInstance(groups[i].deps[j].key, instance);
         //             }
         //         }
         //     }

@@ -1,8 +1,8 @@
-import LifecycleEnum from "../constants/LifecycleEnum";
-import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle";
-import deepEqual from "../utils/deepEqual";
-import SimpleContainer from "./SimpleContainer";
-import InstancesMap from "./helpers/InstancesMap";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
+import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
+import deepEqual from "../utils/deepEqual.js";
+import SimpleContainer from "./SimpleContainer.js";
+import InstancesMap from "./helpers/InstancesMap.js";
 
 class SingletoneContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {

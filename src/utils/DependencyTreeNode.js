@@ -1,4 +1,4 @@
-import DIClazz from "../DIClazz";
+import DIClazz from "../DIClazz.js";
 
 class DependencyTreeNode extends DIClazz {
     constructor({

@@ -1,5 +1,5 @@
-import DependencyTree from "./DependencyTree";
-import DependencyTreeNode from "./DependencyTreeNode";
+import DependencyTree from "./DependencyTree.js";
+import DependencyTreeNode from "./DependencyTreeNode.js";
 
 class DependencyTreeFactory {
 
