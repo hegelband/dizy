@@ -1,5 +1,8 @@
+import { parseType } from "../../../ReflectionJs/index.js";
 import { InvalidDIObjectLifecycle, InvalidDIObjectName, InvalidDIObjectParent } from "../../DIObjectConfig.js";
 import LifecycleEnum from "../../constants/LifecycleEnum.js";
+import Lifecycle from "../../lifecycle/Lifecycle.js";
+import AbstractContextContainer from "../AbstractContextContainer.js";
 // import deepEqual from "../../utils/deepEqual";
 import ContextContainer from "../ContextContainer.js";
 import DIObjectKey from "./DIObjectKey.js";
@@ -25,6 +28,21 @@ class DIObjectKeyFactory {
     #keys;
 
     createKey(parent, name, lifecycle, isClass) {
+        if (!(parent instanceof AbstractContextContainer)) {
+            throw new Error("DIObjectKeyFactory.create() 'parent' arg is invalid. 'parent' must be an instance of AbstractContextContainer");
+        }
+        if (parseType(name) !== 'string') {
+            throw new Error("DIObjectKeyFactory.create() 'name' arg is invalid. 'name' must be a string.");
+        }
+        if (name === '') {
+            throw new Error("DIObjectKeyFactory.create() 'name' arg is empty.");
+        }
+        if (!(lifecycle instanceof Lifecycle)) {
+            throw new Error("DIObjectKeyFactory.create() 'lifecycle' arg is invalid. 'lifecycle' must be an instance of Lifecycle");
+        }
+        if (parseType(isClass) !== 'boolean') {
+            throw new Error("DIObjectKeyFactory.create() 'isClass' arg type is invalid. 'isClass' type must be boolean");
+        }
         this.#validateKeyParams(parent, name, lifecycle, isClass);
         const keyDescription = {
             parent,

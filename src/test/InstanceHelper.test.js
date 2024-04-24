@@ -3,12 +3,12 @@ import { assert } from 'chai';
 import InstanceHelper from "../containers/helpers/InstanceHelper.js";
 import DIObjectKeyFactory from "../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../lifecycle/SingletoneLifecycle.js";
+import ContextContainer from "../containers/ContextContainer.js";
 
-let keyFactory;
 describe('InstanceHelper', function () {
-    before(function () {
-        keyFactory = new DIObjectKeyFactory();
-    });
+    const keyFactory = new DIObjectKeyFactory();
+    const context = new ContextContainer([], 'context');
+
     describe('InstanceHelper.create()', function () {
         it('create instance of class C - InstanceHelper.create(clazzTreeNode, [A, B])', function () {
             class C {
@@ -18,7 +18,7 @@ describe('InstanceHelper', function () {
                 }
             }
             const classTreeNode = new DependencyTreeNode({
-                key: keyFactory.createKey(null, 'testClass', new SingletoneLifecycle(), true),
+                key: keyFactory.createKey(context, 'testClass', new SingletoneLifecycle(), true),
                 name: 'testClass',
                 type: C,
                 isClass: true,
@@ -33,7 +33,7 @@ describe('InstanceHelper', function () {
         it('create instance of function K - InstanceHelper.create(clazzTreeNode, [T, D])', function () {
             function K(T, D) { return T.width; }
             const funcTreeNode = new DependencyTreeNode({
-                key: keyFactory.createKey(null, 'testFunc', new SingletoneLifecycle(), true),
+                key: keyFactory.createKey(context, 'testFunc', new SingletoneLifecycle(), true),
                 name: 'testFunc',
                 type: K,
                 isClass: false,
