@@ -1,4 +1,4 @@
-import { parseType } from "../../ReflectionJs/index.js";
+import { parseType } from "../../../ReflectionJs/index.js";
 import DependencyTreeNode from "./DependencyTreeNode.js";
 
 class BaseNodeInvalid extends Error {

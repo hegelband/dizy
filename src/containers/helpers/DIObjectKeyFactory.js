@@ -1,5 +1,5 @@
 import { parseType } from "../../../ReflectionJs/index.js";
-import { InvalidDIObjectLifecycle, InvalidDIObjectName, InvalidDIObjectParent } from "../../DIObjectConfig.js";
+import { UnregisteredDIObjectLifecycle, InvalidDIObjectName, InvalidDIObjectParent } from "../../DIObjectConfig.js";
 import LifecycleEnum from "../../constants/LifecycleEnum.js";
 import Lifecycle from "../../lifecycle/Lifecycle.js";
 import AbstractContextContainer from "../AbstractContextContainer.js";
@@ -79,8 +79,8 @@ class DIObjectKeyFactory {
         if (!(typeof name === 'string' || typeof name === 'symbol') || !name === true) {
             throw new InvalidDIObjectName(name);
         }
-        if (typeof lifecycle.id !== 'number' || lifecycle.id < LifecycleEnum.Persistent || lifecycle.id > LifecycleEnum.Demanded) {
-            throw new InvalidDIObjectLifecycle(lifecycle);
+        if (!Object.values(LifecycleEnum).find(v => v === lifecycle.id)) {
+            throw new UnregisteredDIObjectLifecycle(lifecycle);
         }
         return true;
     }

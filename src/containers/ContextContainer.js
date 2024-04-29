@@ -74,7 +74,7 @@ class ContextContainer extends AbstractContextContainer {
     }
 
     getScope(lifecycleId) {
-        if (typeof lifecycleId !== 'number' || lifecycleId < LifecycleEnum.Persistent || lifecycleId > LifecycleEnum.Demanded) {
+        if (typeof lifecycleId !== 'number' || !Object.values(LifecycleEnum).find(v => v === lifecycleId)) {
             return null;
         }
         return this.scopes.get(lifecycleId);

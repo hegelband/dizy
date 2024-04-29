@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import DependencyTree from "../utils/DependencyTree.js";
+import DependencyTree from "../containers/helpers/DependencyTree.js";
 import DependencyTreeFixture from './fixtures/DependencyTreeFixture.js';
 
 describe('DependencyTree', function () {

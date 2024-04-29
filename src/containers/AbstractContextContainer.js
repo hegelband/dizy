@@ -4,12 +4,13 @@ import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultV
 import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
 import HasNoDIObjectWithKey from "../errors/HasNoDIObjectWithKey.js";
-import DependencyTreeFactory from "../utils/DependencyTreeFactory.js";
+import DependencyTreeFactory from "./helpers/DependencyTreeFactory.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import { getArgumentDefaultValue, getBaseClass, getClassConstructorArgsNames, getFunctionArgsNames, parseType } from "../../ReflectionJs/index.js";
 import Lifecycle from "../lifecycle/Lifecycle.js";
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
+import { DIObjectConfig } from "../DIObjectConfig.js";
 
 class DIObjectHasInvalidName extends Error {
     constructor(name, contextName) {
@@ -44,8 +45,35 @@ class DerivedClassConstructorArgsError extends Error {
     }
 }
 
+class InvalidContextConfig extends Error {
+    constructor() {
+        super('Invalid context config. Config must be an array of DIObjectConfig instances');
+    }
+}
+
+class InvalidContextParent extends Error {
+    constructor() {
+        super("Invalid context parent. Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
+    }
+}
+
+class InvalidDIObjectKeyFactory extends Error {
+    constructor() {
+        super("Invalid context keyFactory. KeyFactory must be an instance of DIObjectKeyFactory or it's derived class");
+    }
+}
+
 class AbstractContextContainer extends DIContainer {
     constructor(config = [], name = '', parent = null, keyFactory = new DIObjectKeyFactory()) {
+        if (!Array.isArray(config) && config.filter(c => !(c instanceof DIObjectConfig))) {
+            throw new InvalidContextConfig();
+        }
+        if (!(parent instanceof AbstractContextContainer) && parent !== null && parent !== undefined) {
+            throw new InvalidContextParent();
+        }
+        if (!(keyFactory instanceof DIObjectKeyFactory)) {
+            throw new InvalidDIObjectKeyFactory();
+        }
         super([]);
         this.config = config;
         this.name = name;
@@ -77,8 +105,7 @@ class AbstractContextContainer extends DIContainer {
     }
 
     #initClasses() {
-        const allConfigs = [];
-        this.config.forEach(containerObject => {
+        const allConfigs = this.config.map(containerObject => {
             console.log(containerObject.type.toString());
             const objName = typeof containerObject.name === 'symbol' ? Symbol.keyFor(containerObject.name) : containerObject.name;
             const typeOfContainerObject = parseType(containerObject.type);
@@ -103,15 +130,13 @@ class AbstractContextContainer extends DIContainer {
                     return arg;
                 })
             };
-            allConfigs.push(
-                new DIClazz(
-                    this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
-                    objName,
-                    containerObject.type,
-                    isClass,
-                    containerObject.lifecycle,
-                    constructor,
-                )
+            return new DIClazz(
+                this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
+                objName,
+                containerObject.type,
+                isClass,
+                containerObject.lifecycle,
+                constructor,
             );
             // ToDo Правила жизненных циклов
         });
@@ -206,8 +231,7 @@ class AbstractContextContainer extends DIContainer {
         // Change this conditions after Lifecycle class will be defined.
         const objectWithInvalidLifecycle = this.config.find(({ lifecycle }) => {
             return !(lifecycle instanceof Lifecycle)
-                || lifecycle.id < LifecycleEnum.Persistent
-                || lifecycle.id > LifecycleEnum.Demanded;
+                || !Object.values(LifecycleEnum).find(v => v === lifecycle.id);
         });
         if (objectWithInvalidLifecycle) {
             throw new DIObjectHasInvalidLifecycleIdentifier(objectWithInvalidLifecycle.lifecycle.id, this.name);

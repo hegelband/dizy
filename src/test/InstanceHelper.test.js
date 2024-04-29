@@ -1,9 +1,10 @@
-import DependencyTreeNode from "../utils/DependencyTreeNode.js";
+import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import { assert } from 'chai';
 import InstanceHelper from "../containers/helpers/InstanceHelper.js";
 import DIObjectKeyFactory from "../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../lifecycle/SingletoneLifecycle.js";
 import ContextContainer from "../containers/ContextContainer.js";
+import DIClazz from "../DIClazz.js";
 
 describe('InstanceHelper', function () {
     const keyFactory = new DIObjectKeyFactory();
@@ -17,31 +18,29 @@ describe('InstanceHelper', function () {
                     this.b = B;
                 }
             }
-            const classTreeNode = new DependencyTreeNode({
-                key: keyFactory.createKey(context, 'testClass', new SingletoneLifecycle(), true),
-                name: 'testClass',
-                type: C,
-                isClass: true,
-                lifecycle: new SingletoneLifecycle(),
-                constructor: { startPosition: 30, args: ['A', 'B'] },
-                deps: [],
-                height: 0,
-            });
+            const baseClazz = new DIClazz(
+                keyFactory.createKey(context, 'testClass', new SingletoneLifecycle(), true),
+                'testClass',
+                C,
+                true,
+                new SingletoneLifecycle(),
+                { startPosition: 30, args: ['A', 'B'] },
+            );
+            const classTreeNode = new DependencyTreeNode(baseClazz, 0, []);
             assert.instanceOf(InstanceHelper.createInstance(classTreeNode, [{ width: 10 }, { height: 10 }]), classTreeNode.type);
         });
 
         it('create instance of function K - InstanceHelper.create(clazzTreeNode, [T, D])', function () {
             function K(T, D) { return T.width; }
-            const funcTreeNode = new DependencyTreeNode({
-                key: keyFactory.createKey(context, 'testFunc', new SingletoneLifecycle(), true),
-                name: 'testFunc',
-                type: K,
-                isClass: false,
-                lifecycle: new SingletoneLifecycle(),
-                constructor: { startPosition: 30, args: ['T', 'D'] },
-                deps: [],
-                height: 0,
-            });
+            const baseClazz = new DIClazz(
+                keyFactory.createKey(context, 'testFunc', new SingletoneLifecycle(), true),
+                'testFunc',
+                K,
+                false,
+                new SingletoneLifecycle(),
+                { startPosition: 30, args: ['T', 'D'] },
+            );
+            const funcTreeNode = new DependencyTreeNode(baseClazz, 0, []);
             const funcWrapper = InstanceHelper.createInstance(funcTreeNode, [{ width: 10 }, { height: 10 }]);
             assert.equal(funcWrapper.func, K);
         });
