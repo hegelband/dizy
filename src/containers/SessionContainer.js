@@ -5,11 +5,11 @@ import InstancesMap from "./helpers/InstancesMap.js";
 
 class SessionContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
+        super(parent, classTreeList);
         const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Session);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Session', classWithInvalidLifecycle);
         }
-        super(classTreeList);
         this.#parent = parent;
         // this.#init();
     }

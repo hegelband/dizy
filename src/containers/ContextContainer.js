@@ -31,7 +31,6 @@ class ContextContainer extends AbstractContextContainer {
                     // console.log(this.scopes);
                     break;
                 case LifecycleEnum.Singletone:
-                    console.log('done');
                     this.scopes.set(lifecycle.id, new SingletoneContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Singletone)));
                     break;
                 case LifecycleEnum.Demanded:

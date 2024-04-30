@@ -1,10 +1,20 @@
 import LifecycleEnum from "../constants/LifecycleEnum.js";
+import AbstractContextContainer from "./AbstractContextContainer.js";
 import DIContainer from "./DIContainer.js";
 import InstanceHelper from "./helpers/InstanceHelper.js";
 
+class InvalidSimpleContainerParent extends Error {
+    constructor() {
+        super("Invalid simple container parent. Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
+    }
+}
+
 class SimpleContainer extends DIContainer {
-    constructor(classTreeList = []) {
-        super(classTreeList);
+    constructor(parent, classTreeList = []) {
+        if (!(parent instanceof AbstractContextContainer)) {
+            throw new InvalidSimpleContainerParent();
+        }
+        super(parent, classTreeList);
     }
 
     _buildInstance(clazzTree) { // create new instance and add it in Map

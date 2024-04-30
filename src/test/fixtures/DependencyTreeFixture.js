@@ -3,14 +3,20 @@ import ContextContainer from "../../containers/ContextContainer.js";
 import DIObjectKeyFactory from "../../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../../lifecycle/SingletoneLifecycle.js";
 import DependencyTreeNode from "../../containers/helpers/DependencyTreeNode.js";
+import { SingletoneConfig } from "../../DIObjectConfig.js";
 
-const context = new ContextContainer([], 'context');
 class A {
     constructor(b) { }
 }
 class B {
     constructor() { }
 }
+
+const diConfig = [
+    new SingletoneConfig('noname', A),
+    new SingletoneConfig('b', B),
+];
+const context = new ContextContainer(diConfig, 'context');
 
 const baseClazz = new DIClazz(
     (new DIObjectKeyFactory()).createKey(context, 'nonameA', new SingletoneLifecycle(), true),
@@ -50,7 +56,9 @@ export default {
     context,
     A,
     B,
+    diConfig,
     baseNode,
+    derivedNode,
     baseClazz,
     derivedClazz,
 }

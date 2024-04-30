@@ -68,13 +68,13 @@ class AbstractContextContainer extends DIContainer {
         if (!Array.isArray(config) && config.filter(c => !(c instanceof DIObjectConfig))) {
             throw new InvalidContextConfig();
         }
-        if (!(parent instanceof AbstractContextContainer) && parent !== null && parent !== undefined) {
+        if (parent !== null && parent !== undefined && !(parent instanceof AbstractContextContainer)) {
             throw new InvalidContextParent();
         }
         if (!(keyFactory instanceof DIObjectKeyFactory)) {
             throw new InvalidDIObjectKeyFactory();
         }
-        super([]);
+        super(parent, []);
         this.config = config;
         this.name = name;
         this.#parent = parent;

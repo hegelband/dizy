@@ -6,11 +6,11 @@ import PersistentInstanceProxyFactory from './helpers/PersistentInstanceProxyFac
 
 class PersistentContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
+        super(parent, classTreeList);
         const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Persistent);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Persistent', classWithInvalidLifecycle);
         }
-        super(classTreeList);
         this.#parent = parent;
         this.#init();
     }

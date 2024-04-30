@@ -6,11 +6,11 @@ import InstancesMap from "./helpers/InstancesMap.js";
 
 class SingletoneContainer extends SimpleContainer {
     constructor(parent, classTreeList = []) {
+        super(parent, classTreeList);
         const classWithInvalidLifecycle = classTreeList.find(cls => cls.baseNode.lifecycle.id !== LifecycleEnum.Singletone);
         if (classWithInvalidLifecycle) {
             throw new ContainerHasClassWithInvalidLifecycle('Singletone', classWithInvalidLifecycle);
         }
-        super(classTreeList);
         this.#parent = parent;
     }
 
@@ -25,11 +25,11 @@ class SingletoneContainer extends SimpleContainer {
     }
 
     addInstance(key, instance) {
+        // check that key is valid (there is a classTree node with that key)
         this.#instances.set(key.key, instance);
     }
 
     getInstance(key) {
-        console.log('key');
         // const existed = this.#instances.getBySymbol(key.key);
         const existed = this.#instances.get(key.key);
         if (existed) {
