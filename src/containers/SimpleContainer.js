@@ -28,7 +28,7 @@ class SimpleContainer extends DIContainer {
         //             if (dependency.lifecycle.id !== LifecycleEnum.Demanded) {
         //                 argumentValues.push(this.getInstance(dependency.name) || this.getParent().getInstance(dependency.name));
         //             } else {
-        //                 argumentValues.push(this.getParent().getInstance(dependency.name));
+        //                 argumentValues.push(this.getParent().getInstance(dependency.name, dependency.lifecycle.id, true));
         //             }
         //         });
         //         if (clazz.lifecycle.id !== LifecycleEnum.Demanded) {
@@ -47,7 +47,8 @@ class SimpleContainer extends DIContainer {
         if (clazzTree.baseNode.constructor.args.length > 0) {
             clazzTree.baseNode.constructor.args.forEach((arg) => {
                 const argClazz = this.getParent().classTreeList.find(clsTree => clsTree.baseNode.name === arg);
-                const existedInstance = this.getInstance(argClazz.baseNode.key) || this.getParent().getInstance(argClazz.baseNode.name);
+                const existedInstance = this.getInstance(argClazz.baseNode.key)
+                    || this.getParent().getInstance(argClazz.baseNode.name, argClazz.baseNode.lifecycle.id, true);
                 if (existedInstance) {
                     return argumentValues.push(existedInstance);
                 }

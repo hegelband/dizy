@@ -16,7 +16,7 @@ const diConfig = [
     new SingletoneConfig('noname', A),
     new SingletoneConfig('b', B),
 ];
-const context = new ContextContainer(diConfig, 'context');
+const context = new ContextContainer(diConfig);
 
 const baseClazz = new DIClazz(
     (new DIObjectKeyFactory()).createKey(context, 'nonameA', new SingletoneLifecycle(), true),

@@ -4,16 +4,54 @@ import DemandedFactory from "./DemandedFactory.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 import AbstractContextContainer from "./AbstractContextContainer.js";
+import generateRandomString from "../utils/generateRandomString.js";
+
+class NotUniqueContextContainerName extends Error {
+    constructor(name) {
+        super(`Context name '${name}' is not unique. Context name must be unique string.`);
+    }
+}
+
+class InvalidContextContainerNameType extends Error {
+    constructor() {
+        super(`Invalid context name type. Type of context name must be a string.`);
+    }
+}
+
+class InvalidContextChild extends Error {
+    constructor() {
+        super("Invalid context child. Child must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
+    }
+}
 
 class ContextContainer extends AbstractContextContainer {
     constructor(config = [], name = '', parent = null, keyFactory = new DIObjectKeyFactory()) {
+        if (name === '') {
+            name = generateRandomString(7);
+        }
         super(config, name, parent, keyFactory);
-        this.#parent = parent;
-        this.#keyFactory = keyFactory;
+        ContextContainer.#addName(name);
+        // this.#parent = parent;
+        if (parent instanceof AbstractContextContainer) {
+            parent.addChildren(this);
+        }
+        // this.#keyFactory = keyFactory;
     }
 
-    #parent;
-    #keyFactory;
+    static #names = new Set();
+    static #addName(name) {
+        if (typeof name !== 'string') {
+            throw new InvalidContextContainerNameType();
+        }
+        if (this.#names.has(name)) {
+            throw new NotUniqueContextContainerName(name);
+        }
+        this.#names.add(name);
+    }
+
+    // #parent;
+    // #keyFactory;
+    #children = new Map();
 
     scopes = new Map();
 
@@ -57,13 +95,31 @@ class ContextContainer extends AbstractContextContainer {
         if (scope.getInstance(classTree.baseNode.key)) return true;
     }
 
-    getInstance(name, lifecycleId) {
+    getInstance(name, lifecycleId, calledFromScope) {
         const clazz = this._findClassTree(name, lifecycleId);
+        if (clazz === undefined) {
+            if (calledFromScope) return undefined;
+            return this.#getChildInstance(name, lifecycleId);
+        };
         const key = clazz.baseNode.key;
         const scope = this.getScope(clazz.baseNode.lifecycle.id);
-        if (!scope) return undefined;
+        if (!scope) {
+            if (calledFromScope) return undefined;
+            return this.#getChildInstance(name, lifecycleId);
+        };
         if (scope instanceof DemandedFactory) return scope.createInstance(key);
-        return scope.getInstance(key);
+        return calledFromScope
+            ? scope.getInstance(key)
+            : scope.getInstance(key) ?? this.#getChildInstance(name, lifecycleId);
+    }
+
+    #getChildInstance(name, lifecycleId) {
+        let instance;
+        const childContext = [...this.#children.values()].find(context => {
+            instance = context.getInstance(name, lifecycleId);
+            return instance !== undefined;
+        });
+        return childContext ? instance : undefined;
     }
 
     typeMatch(name, type) {
@@ -77,6 +133,21 @@ class ContextContainer extends AbstractContextContainer {
             return null;
         }
         return this.scopes.get(lifecycleId);
+    }
+
+    getChildren() {
+        return this.#children;
+    }
+
+    addChild(childContext) {
+        if (!(childContext instanceof AbstractContextContainer)) {
+            throw new InvalidContextChild();
+        }
+        this.#children.set(childContext.name, childContext);
+    }
+
+    deleteChild(childName) {
+        this.#children.delete(childName);
     }
 }
 

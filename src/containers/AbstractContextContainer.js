@@ -188,7 +188,8 @@ class AbstractContextContainer extends DIContainer {
             clazz = [...this.classTreeList].sort((a, b) => a.baseNode.lifecycle.id - b.baseNode.lifecycle.id).find(findCallback);
         }
         if (!clazz) {
-            throw new HasNoDIObjectWithKey(typeof name !== 'string' ? name.name : name, this.name);
+            return undefined;
+            // throw new HasNoDIObjectWithKey(typeof name !== 'string' ? name.name : name, this.name);
         }
         return clazz;
     }

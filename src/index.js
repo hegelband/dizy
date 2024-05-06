@@ -4,6 +4,7 @@ import Window, { AbstractWindow } from './modules/Window.js';
 // import { SideBar } from './modules/Window.js';
 import Button from './modules/Button.js';
 import SideBar from './modules/SideBar.js';
+import dot from './modules/dot.js';
 import rectangle from './modules/rectangle.js';
 
 const names = {
@@ -29,14 +30,23 @@ const DIConfig = [
         }
     ),
     new SingletoneConfig(names.sideBarName, SideBar),
-    new SessionConfig(names.rectangleName, rectangle),
     new SessionConfig(names.buttonName, Button),
 ];
 
+const DISecondConfig = [
+    new SessionConfig('dot', dot),
+    new SessionConfig(names.rectangleName, rectangle),
+];
+
 const appContext = new ContextContainer(DIConfig, 'app context');
+const appSecondContext = new ContextContainer(DISecondConfig, 'app second context');
+appContext.addChild(appSecondContext);
 
 appContext.init();
+appSecondContext.init();
 appContext.getInstance(names.windowName);
+console.log(appContext.getInstance(names.rectangleName));
+console.log(appContext.getChildren());
 const w = appContext.getInstance(Window);
 // console.log(appContext.typeMatch(names.windowName, Window));
 // const aw = appContext.getInstance(AbstractWindow);

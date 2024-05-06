@@ -67,7 +67,7 @@ describe('SingletoneContainer', function () {
             new DependencyTree(DependencyTreeFixture.baseNode),
             new DependencyTree(new DependencyTreeNode(DependencyTreeFixture.derivedClazz, 0, []))
         ];
-        const context = new ContextContainer(DependencyTreeFixture.diConfig, 'context');
+        const context = new ContextContainer(DependencyTreeFixture.diConfig);
         context.init();
         const simpleContainer = new SingletoneContainer(context, clazzTrees);
         const instance = simpleContainer.getInstance(DependencyTreeFixture.baseNode.key);
@@ -90,6 +90,22 @@ describe('SingletoneContainer', function () {
                 const noInstance = simpleContainer.getInstance('noKey');
                 assert.equal(noInstance, undefined);
             });
+        });
+    });
+
+    describe("SingletoneContainer.addInstance('stringKey', instance)", function () {
+        const context = new ContextContainer(DependencyTreeFixture.diConfig);
+        context.init();
+        const simpleContainer = new SingletoneContainer(context, []);
+
+        it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", function () {
+            const funcThrowsError = () => simpleContainer.addInstance('stringKey', new DependencyTreeFixture.derivedClazz.type());
+            assert.throws(funcThrowsError, Error, `Invalid key type. Argument 'key' must be an instance of DIObjectKey class.`);
+        });
+
+        it("should add an instance (error not thrown)", function () {
+            const funcThrowsError = () => simpleContainer.addInstance(DependencyTreeFixture.derivedNode.key, new DependencyTreeFixture.derivedClazz.type());
+            assert.doesNotThrow(funcThrowsError, Error);
         });
     });
 

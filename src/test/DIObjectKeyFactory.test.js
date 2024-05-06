@@ -14,7 +14,7 @@ describe('DIObjectKeyFactory', function () {
     describe('DIObjectKeyFactory.create()', function () {
 
         const keyFactory = new DIObjectKeyFactory();
-        const context = new ContextContainer([], 'context');
+        const context = new ContextContainer([]);
         const singletoneLifecycle = new SingletoneLifecycle();
 
         it('create DIObjectKey instance by DIObjectKeyFactory.create() with no args', function () {
@@ -64,7 +64,7 @@ describe('DIObjectKeyFactory', function () {
 
         it('create DIObjectKey instance by DIObjectKeyFactory.create() with valid arguments', function () {
             const keyStr = keyFactory.createKey(context, 'noname', singletoneLifecycle, true).key;
-            assert.equal(keyStr, '@context/noname/2/true');
+            assert.equal(keyStr, `@${context.name}/noname/2/true`);
         });
     });
 });

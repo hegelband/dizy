@@ -2,6 +2,7 @@ import LifecycleEnum from "../constants/LifecycleEnum.js";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
 import deepEqual from "../utils/deepEqual.js";
 import SimpleContainer from "./SimpleContainer.js";
+import DIObjectKey from "./helpers/DIObjectKey.js";
 import InstancesMap from "./helpers/InstancesMap.js";
 
 class SingletoneContainer extends SimpleContainer {
@@ -26,6 +27,13 @@ class SingletoneContainer extends SimpleContainer {
 
     addInstance(key, instance) {
         // check that key is valid (there is a classTree node with that key)
+        if (!(key instanceof DIObjectKey)) {
+            throw new Error(`Invalid key type. Argument 'key' must be an instance of DIObjectKey class.`);
+        }
+        // delete this rule, because we need to access adding instance from outside
+        // if (!this.classTreeList.find(clsTree => clsTree.baseNode.key.key === key.key)) {
+        //     throw new Error(`ClassTree with key ${key.key} in '${this.getParent().name}/SingletoneContainer' not found.`);
+        // }
         this.#instances.set(key.key, instance);
     }
 

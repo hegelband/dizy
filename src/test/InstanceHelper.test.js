@@ -8,7 +8,7 @@ import DIClazz from "../DIClazz.js";
 
 describe('InstanceHelper', function () {
     const keyFactory = new DIObjectKeyFactory();
-    const context = new ContextContainer([], 'context');
+    const context = new ContextContainer([]);
 
     describe('InstanceHelper.create()', function () {
         it('create instance of class C - InstanceHelper.create(clazzTreeNode, [A, B])', function () {

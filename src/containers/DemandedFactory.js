@@ -21,7 +21,7 @@ class DemandedFactory {
             clazzTree.baseNode.constructor.args.forEach((arg) => {
                 const argClazz = this.getParent().classTreeList.find(clsTree => clsTree.baseNode.name === arg);
                 const existedInstance = argClazz.baseNode.lifecycle.id !== LifecycleEnum.Demanded
-                    ? this.getParent().getInstance(argClazz.baseNode.name)
+                    ? this.getParent().getInstance(argClazz.baseNode.name, argClazz.baseNode.lifecycle.id, true)
                     : undefined;
                 if (existedInstance) {
                     return argumentValues.push(existedInstance);
