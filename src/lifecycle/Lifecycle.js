@@ -1,23 +1,22 @@
 class NotImplementedException extends Error {
-    constructor() {
-        this.message = 'Not implemented error';
-        super(this.message);
-    }
+	constructor() {
+		this.message = "Not implemented error";
+		super(this.message);
+	}
 }
 
 class Lifecycle {
-    constructor(id) {
-        this.id = id;
-    }
+	constructor(id) {
+		this.id = id;
+	}
 
-    beforeCreate() {
-        throw new NotImplementedException();
-    };
+	beforeCreate() {
+		throw new NotImplementedException();
+	}
 
-    afterCreate() {
-        throw new NotImplementedException();
-    }
-
+	afterCreate() {
+		throw new NotImplementedException();
+	}
 }
 
 export default Lifecycle;
