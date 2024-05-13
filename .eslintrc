@@ -1,0 +1,69 @@
+{
+	// Настройки проекта
+	"env": {
+		// Проект для браузера
+		"browser": true,
+		// Включаем возможности ES6
+		"es6": true,
+		// Добавляем возможности ES2017
+		"es2017": true,
+		"es2022": true,
+		"mocha": true,
+		"node": true,
+		"amd": true
+	},
+	// Наборы правил
+	"extends": [
+		// Базовый набор правил eslint
+		"plugin:prettier/recommended"
+	],
+	// Движок парсинга
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	// Плагин с наборами правил для TypeScript и для React
+	"plugins": [
+		"prettier"
+	],
+	"rules": {
+		// Блок выключенных правил
+		// Блок включаемых правил
+		"eqeqeq": [
+			"error",
+			"always",
+			{
+				"null": "ignore"
+			}
+		],
+		//        "indent": ["error", 4, { "SwitchCase": 1 }],
+		// "no-console": [
+		//     "warn",
+		//     {
+		//         "allow": [
+		//             "warn",
+		//             "error"
+		//         ]
+		//     }
+		// ],
+		"dot-location": [
+			"error",
+			"property"
+		],
+		"no-void": "error",
+		"no-unused-vars": "error",
+		"radix": "error",
+		"max-len": [
+			"error",
+			{
+				"code": 145
+			}
+		],
+		"prettier/prettier": [
+			"error",
+			{
+				"endOfLine": "auto"
+			}
+		]
+	}
+}

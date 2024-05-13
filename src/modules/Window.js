@@ -8,19 +8,19 @@
 import SideBar from "./SideBar.js";
 
 export class AbstractWindow {
-    constructor(xyz = SideBar) {
-        this.sideBar = xyz;
-    }
+  constructor(xyz = SideBar) {
+    this.sideBar = xyz;
+  }
 }
 
 class Window extends AbstractWindow {
-    constructor(xxx = SideBar) {
-        super(xxx);
-        // comment
-        console.log('Window create with sidebar ' + xxx);
-    }
+  constructor(sideBar) {
+    super(sideBar);
+    // comment
+    console.log("Window create with sidebar " + sideBar);
+  }
 
-    done() { }
+  done() {}
 }
 
 export default Window;

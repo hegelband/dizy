@@ -1,7 +1,7 @@
 class Animal {
-    constructor() {
-        // console.log('animal');
-    }
+	constructor() {
+		// console.log('animal');
+	}
 }
 
 export default Animal;
