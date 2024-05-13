@@ -62,19 +62,19 @@ export class DIObjectConfig {
 }
 
 export class DemandedConfig extends DIObjectConfig {
-	constructor(name = "", type = {}, beforeCreate = () => {}, afterCreate = () => {}) {
+	constructor(name = "", type = {}, beforeCreate = () => { }, afterCreate = () => { }) {
 		super(name, type, new DemandedLifecycle(beforeCreate, afterCreate));
 	}
 }
 
 export class SingletoneConfig extends DIObjectConfig {
-	constructor(name = "", type = {}, beforeCreate = () => {}, afterCreate = () => {}) {
+	constructor(name = "", type = {}, beforeCreate = () => { }, afterCreate = () => { }) {
 		super(name, type, new SingletoneLifecycle(beforeCreate, afterCreate));
 	}
 }
 
 export class SessionConfig extends DIObjectConfig {
-	constructor(name = "", type = {}, beforeCreate = () => {}, afterCreate = () => {}) {
+	constructor(name = "", type = {}, beforeCreate = () => { }, afterCreate = () => { }) {
 		super(name, type, new SessionLifecycle(beforeCreate, afterCreate));
 	}
 }
