@@ -1,7 +1,7 @@
 {
 	"name": "dizy",
-	"version": "1.0.0",
-	"description": "",
+	"version": "0.2.0",
+	"description": "Inversion of Control Container for JavaScript and Node.js",
 	"main": "./dist/dizy.js",
 	"module": "./dist/dizy-esm.js",
 	"browser": "./dist/dizy-esm.js",
@@ -11,7 +11,8 @@
 		"prepare": "husky install",
 		"test": "cd src && mocha",
 		"lint": "eslint --ext .js src --fix",
-		"start": "webpack serve --mode development --config webpack/dev.cjs",
+		"prettier-check": "prettier --check src/**/*.{js,cjs,mjs}",
+		"prettier-write": "prettier --write src/**/*.{js,cjs,mjs}",
 		"build": "webpack --config webpack/prod.cjs && webpack --config webpack/prod-esm.cjs"
 	},
 	"author": "",
@@ -19,7 +20,9 @@
 		"dizy",
 		"di",
 		"dijs",
-		"dependency injection"
+		"ioc",
+		"dependency injection",
+		"inversion of control"
 	],
 	"repository": {
 		"type": "git",
