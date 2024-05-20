@@ -8,7 +8,7 @@
 	"jsnext:main": "./dist/dizy-esm.js",
 	"type": "module",
 	"scripts": {
-		"prepare": "husky install",
+		"prepare": "husky",
 		"test": "cd src && mocha",
 		"lint": "eslint --ext .js src --fix",
 		"start": "webpack serve --mode development --config webpack/dev.cjs",
