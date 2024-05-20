@@ -9,4 +9,5 @@
 	"eslint.validate": [
 		"prettier"
 	],
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
 }
