@@ -32,7 +32,7 @@ class PersistentContainer extends SimpleContainer {
 			if (this.#instances.has(key)) {
 				return;
 			}
-			console.log(key);
+			// console.log(key);
 			this.#buildInstance(cls);
 		});
 	}

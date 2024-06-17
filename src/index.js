@@ -1,4 +1,3 @@
-
 import DIClazzModule from "./DIClazz.js";
 import {
 	DIObjectConfig as DIObjectConfigModule,

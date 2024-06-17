@@ -133,7 +133,7 @@ class AbstractContextContainer extends DIContainer {
 
 	#initClazzes() {
 		this.#clazzes = this.config.map((containerObject) => {
-			console.log(containerObject.type.toString());
+			// console.log(containerObject.type.toString());
 			const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
 			const typeOfContainerObject = parseType(containerObject.type);
 			if (typeOfContainerObject !== "class" && typeOfContainerObject !== "function" && typeOfContainerObject !== "function class") {
@@ -149,10 +149,10 @@ class AbstractContextContainer extends DIContainer {
 				args: constructorArgs.args.map((arg) => {
 					const defaultValue = getArgumentDefaultValue(arg);
 					if (defaultValue && defaultValue.value) {
-						console.log(defaultValue);
+						// console.log(defaultValue);
 						const obj = this.config.find((cls) => cls.type.name === defaultValue.value);
 						if (!obj) {
-							console.log(containerObject);
+							// console.log(containerObject);
 							throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
 						}
 						return typeof obj.name === "symbol" ? Symbol.keyFor(obj.name) : obj.name;
@@ -326,7 +326,7 @@ class AbstractContextContainer extends DIContainer {
 		if (parseType(clazz) !== "class") return true;
 		const baseClass = getBaseClass(clazz);
 		const isAnotherDIObject = this.config.findIndex((objConfig) => objConfig.type.name === baseClass.name) !== -1;
-		console.log(clazz.name, baseClass.name, isAnotherDIObject);
+		// console.log(clazz.name, baseClass.name, isAnotherDIObject);
 		if (baseClass.name !== "Object") {
 			if (isAnotherDIObject) {
 				const clsConstructorArgs = getClassConstructorArgsNames(clazz).args;

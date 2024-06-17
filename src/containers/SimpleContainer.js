@@ -55,7 +55,7 @@ class SimpleContainer extends DIContainer {
 				if (existedInstance) {
 					return argumentValues.push(existedInstance);
 				}
-				console.log(argClazz.baseNode.name);
+				// console.log(argClazz.baseNode.name);
 				argumentValues.push(this._buildInstance(argClazz));
 			});
 		}
