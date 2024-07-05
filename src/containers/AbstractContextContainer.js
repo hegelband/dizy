@@ -7,12 +7,11 @@ import {
 } from "../../ReflectionJs/index.js";
 // eslint-disable-next-line no-unused-vars
 import DIClazz from "../DIClazz.js";
-import { DIObjectConfig } from "../DIObjectConfig.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
 import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
 import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
-import DIContainer from "./DIContainer.js";
+import AbstractDIContainer from "./AbstractDIContainer.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import DependencyTreeFactory from "./helpers/DependencyTreeFactory.js";
 
@@ -49,24 +48,6 @@ class DerivedClassConstructorArgsError extends Error {
 	}
 }
 
-class InvalidContextConfig extends Error {
-	constructor() {
-		super("Invalid context config. Config must be an array of DIObjectConfig instances");
-	}
-}
-
-class InvalidContextParent extends Error {
-	constructor() {
-		super("Invalid context parent. Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
-	}
-}
-
-class InvalidDIObjectKeyFactory extends Error {
-	constructor() {
-		super("Invalid context keyFactory. KeyFactory must be an instance of DIObjectKeyFactory or it's derived class");
-	}
-}
-
 class InvalidContextChild extends Error {
 	constructor() {
 		super("Invalid context child. Child must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
@@ -74,30 +55,11 @@ class InvalidContextChild extends Error {
 }
 
 // ToDo: Create ContextContainerFactory and move creation logic.
-class AbstractContextContainer extends DIContainer {
+class AbstractContextContainer extends AbstractDIContainer {
 	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
-		if (!Array.isArray(config) || config.find((c) => !(c instanceof DIObjectConfig))) {
-			throw new InvalidContextConfig();
-		}
-		if (parent !== null && parent !== undefined && !(parent instanceof AbstractContextContainer)) {
-			throw new InvalidContextParent();
-		}
-		if (!name) {
-			throw new Error("Name of Context must be a non empty string.");
-		}
-		if (!(keyFactory instanceof DIObjectKeyFactory)) {
-			throw new InvalidDIObjectKeyFactory();
-		}
 		super(parent, []);
 		this.config = config;
 		this.name = name;
-		if (parent instanceof AbstractContextContainer) {
-			if (parent.getChildren().has(this.name)) {
-				throw new Error("Parent already has this context as a child.");
-			}
-			this.#parent = parent;
-			parent._addChild(this);
-		}
 		this.#keyFactory = keyFactory;
 	}
 
@@ -223,6 +185,16 @@ class AbstractContextContainer extends DIContainer {
 		return this.#parent;
 	}
 
+	setParent(parent) {
+		if (parent instanceof AbstractContextContainer) {
+			if (parent.getChildren().has(this.name)) {
+				throw new Error("Parent already has this context as a child.");
+			}
+			this.#parent = parent;
+			parent.addChild(this);
+		}
+	}
+
 	_removeParent() {
 		this.#parent = null;
 	}
@@ -240,7 +212,7 @@ class AbstractContextContainer extends DIContainer {
 		return this.#children;
 	}
 
-	_addChild(childContext) {
+	addChild(childContext) {
 		if (!(childContext instanceof AbstractContextContainer)) {
 			throw new InvalidContextChild();
 		}

@@ -1,8 +1,9 @@
 import ContextContainer from "../../containers/ContextContainer.js";
+import ContextContainerFactory from "../../containers/ContextContainerFactory.js";
 import DIObjectKeyFactory from "../../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../../lifecycle/SingletoneLifecycle.js";
 
-const context = new ContextContainer([], "context");
+const context = ContextContainerFactory.createContainer([], "context");
 class A {
 	constructor(b) {
 		this.b = b;

@@ -5,10 +5,11 @@ import DIObjectKeyFactory from "../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../lifecycle/SingletoneLifecycle.js";
 import ContextContainer from "../containers/ContextContainer.js";
 import DIClazz from "../DIClazz.js";
+import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 
 describe("InstanceHelper", () => {
 	const keyFactory = new DIObjectKeyFactory();
-	const context = new ContextContainer([]);
+	const context = ContextContainerFactory.createContainer([]);
 
 	describe("InstanceHelper.create()", () => {
 		it("create instance of class C - InstanceHelper.create(clazzTreeNode, [A, B])", () => {

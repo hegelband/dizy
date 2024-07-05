@@ -6,6 +6,7 @@ import DependencyTreeNode from "../../containers/helpers/DependencyTreeNode.js";
 import { DemandedConfig, SessionConfig, SingletoneConfig } from "../../DIObjectConfig.js";
 import DemandedLifecycle from "../../lifecycle/DemandedLifecycle.js";
 import SessionLifecycle from "../../lifecycle/SessionLifecycle.js";
+import ContextContainerFactory from "../../containers/ContextContainerFactory.js";
 
 class A {
 	constructor(b) {
@@ -42,7 +43,7 @@ const diConfig = [
 	new SessionConfig("sessionA", SessionA),
 	new SessionConfig("sessionB", SessionB),
 ];
-const context = new ContextContainer(diConfig);
+const context = ContextContainerFactory.createContainer(diConfig);
 
 const baseClazz = new DIClazz(
 	new DIObjectKeyFactory().createKey(context, "nonameA", new SingletoneLifecycle(), true),
