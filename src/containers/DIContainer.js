@@ -15,6 +15,7 @@ class DIContainerClassTreeListInvalid extends Error {
 	}
 }
 
+// todo: DIContainer interface - not abstract class. For base constructors create AbstractDIContainer class.
 class DIContainer {
 	constructor(parent, classTreeList = []) {
 		if (parent !== null && parent !== undefined && !(parent instanceof DIContainer)) {

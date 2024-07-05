@@ -26,9 +26,11 @@ class DIObjectKeyFactory {
 		this.#keys = keys;
 	}
 
+	// todo: Change from Set to Map
 	#keys;
 
 	createKey(parent, name, lifecycle, isClass) {
+		// todo: fix validation.
 		if (!(parent instanceof AbstractContextContainer)) {
 			throw new Error("DIObjectKeyFactory.create() 'parent' arg is invalid. 'parent' must be an instance of AbstractContextContainer");
 		}
@@ -52,6 +54,8 @@ class DIObjectKeyFactory {
 			isClass,
 		};
 		const keyDescriptionStr = this.#stringifyKeyDescription(keyDescription);
+		// todo: move to method findKey and submethod isExistKey. Need O(1), not O(n)
+		//start
 		let keyExisted = null;
 		this.#keys.forEach((objectKey) => {
 			// if (typeof objectKey.key === 'symbol') {
@@ -65,6 +69,7 @@ class DIObjectKeyFactory {
 		if (keyExisted) throw new NotUniqueDIObjectKey(keyDescription);
 		// const key = new DIObjectKey(Symbol.for(keyDescriptionStr));
 		const key = new DIObjectKey(keyDescriptionStr);
+		//end
 		this.#keys.add(key);
 		return key;
 	}

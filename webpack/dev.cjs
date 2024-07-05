@@ -1,16 +1,15 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require("webpack");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const base = require("./base.cjs");
 const { merge } = require("webpack-merge");
 
 module.exports = merge(base, {
 	//...
-	entry: './src/index-dev.js',
+	entry: "./src/index-dev.js",
 	output: {
-		path: path.resolve(__dirname, '../dist'),
+		path: path.resolve(__dirname, "../dist"),
 	},
 	mode: "development",
 	devServer: {
@@ -29,5 +28,5 @@ module.exports = merge(base, {
 		new HtmlWebpackPlugin({
 			template: "index.html",
 		}),
-	]
+	],
 });

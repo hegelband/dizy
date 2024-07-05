@@ -73,6 +73,7 @@ class InvalidContextChild extends Error {
 	}
 }
 
+// ToDo: Create ContextContainerFactory and move creation logic.
 class AbstractContextContainer extends DIContainer {
 	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
 		if (!Array.isArray(config) || config.find((c) => !(c instanceof DIObjectConfig))) {
