@@ -34,6 +34,14 @@ class SessionContainer extends SimpleContainer {
 		this.#isReady = true;
 	}
 
+	addDIObject(diObjectClazzTree) {
+		if (diObjectClazzTree.baseNode.lifecycle.id !== LifecycleEnum.Session) {
+			throw new ContainerHasClassWithInvalidLifecycle("Session", diObjectClazzTree);
+		}
+		super.addDIObject(diObjectClazzTree);
+		this.init();
+	}
+
 	#buildInstance(clazz) {
 		clazz.baseNode.lifecycle.beforeCreate();
 		const instance = this._buildInstance(clazz);

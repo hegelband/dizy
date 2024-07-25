@@ -10,6 +10,12 @@ import dot from "./modules/dot.js";
 import rectangle from "./modules/rectangle.js";
 import ContextContainerFactory from "./containers/ContextContainerFactory.js";
 
+class UserForm {
+	constructor(button) {
+		this.button = button;
+	}
+}
+
 const names = {
 	windowName: Symbol.for("window"),
 	sideBarName: Symbol.for("sideBar"),
@@ -37,9 +43,13 @@ const DISecondConfig = [new SessionConfigModule("dot", dot), new SessionConfigMo
 const appContext = ContextContainerFactory.createContainer(DIConfig, "app context");
 const appSecondContext = ContextContainerFactory.createContainer(DISecondConfig, "app second context", appContext);
 
+const userFormDIObjectConfig = new SingletoneConfigModule("userForm", UserForm);
+
 appContext.init();
 appSecondContext.init();
 appContext.getInstance(names.windowName);
 console.log(appContext.getInstance(names.rectangleName));
 console.log(appContext.getChildren());
 appContext.getInstance(Window);
+console.log(appContext.addDIObject(userFormDIObjectConfig));
+console.log(appContext.getInstance("userForm"));

@@ -50,6 +50,29 @@ class ContextContainer extends AbstractContextContainer {
 		});
 	}
 
+	addDIObject(diObjectConfig) {
+		const tree = super.addDIObject(diObjectConfig);
+		if (!this.scopes.has(tree.baseNode.lifecycle.id)) {
+			switch (tree.baseNode.lifecycle.id) {
+				case LifecycleEnum.Session:
+					this.scopes.set(tree.baseNode.lifecycle.id, new SessionContainer(this, [tree]));
+					break;
+				case LifecycleEnum.Singletone:
+					this.scopes.set(tree.baseNode.lifecycle.id, new SingletoneContainer(this, [tree]));
+					break;
+				case LifecycleEnum.Demanded:
+					this.scopes.set(tree.baseNode.lifecycle.id, new DemandedFactory(this, [tree]));
+					break;
+				default:
+					break;
+			}
+		} else {
+			const scope = this.scopes.get(tree.baseNode.lifecycle.id);
+			scope.addDIObject(tree);
+		}
+		return true;
+	}
+
 	hasDIObject(name) {
 		const classTree = this._findClassTree(name);
 		return classTree !== undefined;

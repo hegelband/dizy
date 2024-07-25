@@ -65,6 +65,10 @@ class SimpleContainer extends AbstractDIContainer {
 	}
 
 	addInstance() {}
+
+	addDIObject(diObjectClazzTree) {
+		this.classTreeList.push(diObjectClazzTree);
+	}
 }
 
 export default SimpleContainer;
