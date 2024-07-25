@@ -20,7 +20,6 @@ export default {
 	isClass: true,
 	lifecycle: new SingletoneLifecycle(),
 	constructor: {
-		startPosition: 10,
 		args: ["b"],
 	},
 	key: new DIObjectKeyFactory().createKey(context, "b", new SingletoneLifecycle(), true),
@@ -29,7 +28,6 @@ export default {
 	isClass: true,
 	lifecycle: new SingletoneLifecycle(),
 	constructor: {
-		startPosition: 10,
 		args: [],
 	},
 };

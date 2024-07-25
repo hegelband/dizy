@@ -1,5 +1,5 @@
+import ContextContainer from "./ContextContainer.js"; // need to be before import of AbstractContextContainerFactory (why so?)
 import AbstractContextContainerFactory from "./AbstractContextContainerFactory.js";
-import ContextContainer from "./ContextContainer.js";
 import generateRandomString from "../utils/generateRandomString.js";
 import InvalidContextContainerNameType from "../errors/InvalidContextContainerNameType.js";
 import NotUniqueContextContainerName from "../errors/NotUniqueContextContainerName.js";
@@ -11,7 +11,7 @@ class ContextContainerFactory extends AbstractContextContainerFactory {
 		if (typeof name !== "string") {
 			throw new InvalidContextContainerNameType();
 		}
-		if (this.#names.has(name)) {
+		if (ContextContainerFactory.#names.has(name)) {
 			throw new NotUniqueContextContainerName(name);
 		}
 		ContextContainerFactory.#names.add(name);

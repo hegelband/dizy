@@ -105,8 +105,8 @@ class AbstractContextContainer extends AbstractDIContainer {
 			const isClass = typeOfContainerObject === "class" || typeOfContainerObject === "function class";
 			const constructorArgs =
 				typeOfContainerObject === "class"
-					? getClassConstructorArgsNames(containerObject.type)
-					: getFunctionArgsNames(containerObject.type);
+					? { args: getClassConstructorArgsNames(containerObject.type).args }
+					: { args: getFunctionArgsNames(containerObject.type).args };
 			const constructor = {
 				...constructorArgs,
 				args: constructorArgs.args.map((arg) => {

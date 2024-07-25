@@ -16,6 +16,8 @@ import DemandedLifecycleModule from "./lifecycle/DemandedLifecycle.js";
 import LifecycleModule from "./lifecycle/Lifecycle.js";
 import SessionLifecycleModule from "./lifecycle/SessionLifecycle.js";
 import SingletoneLifecycleModule from "./lifecycle/SingletoneLifecycle.js";
+import ContextContainerFactoryModule from "./containers/ContextContainerFactory.js";
+import AbstractContextContainerFactoryModule from "./containers/AbstractContextContainerFactory.js";
 
 const Dizy = {
 	ContextContainer: ContextContainerModule,
@@ -34,10 +36,14 @@ const Dizy = {
 	SingletoneLifecycle: SingletoneLifecycleModule,
 	SessionLifecycle: SessionLifecycleModule,
 	Lifecycle: LifecycleModule,
+	ContextContainerFactory: ContextContainerFactoryModule,
+	AbstractContextContainerFactory: AbstractContextContainerFactoryModule,
 };
 
 export const AbstractContextContainer = Dizy.AbstractContextContainer;
 export const ContextContainer = Dizy.ContextContainer;
+export const ContextContainerFactory = Dizy.ContextContainerFactory;
+export const AbstractContextContainerFactory = Dizy.AbstractContextContainerFactory;
 export const DemandedConfig = Dizy.DemandedConfig;
 export const SessionConfig = Dizy.SessionConfig;
 export const SingletoneConfig = Dizy.SingletoneConfig;

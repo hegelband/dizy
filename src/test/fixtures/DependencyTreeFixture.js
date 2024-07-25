@@ -52,7 +52,6 @@ const baseClazz = new DIClazz(
 	true,
 	new SingletoneLifecycle(),
 	{
-		startPosition: 10,
 		args: ["b"],
 	},
 );
@@ -64,7 +63,6 @@ const derivedClazz = new DIClazz(
 	true,
 	new SingletoneLifecycle(),
 	{
-		startPosition: 10,
 		args: [],
 	},
 );
@@ -76,7 +74,6 @@ const demAClazz = new DIClazz(
 	true,
 	new DemandedLifecycle(),
 	{
-		startPosition: 10,
 		args: ["demB"],
 	},
 );
@@ -88,7 +85,6 @@ const demBClazz = new DIClazz(
 	true,
 	new DemandedLifecycle(),
 	{
-		startPosition: 10,
 		args: [],
 	},
 );
@@ -100,7 +96,6 @@ const sessionAClazz = new DIClazz(
 	true,
 	new SessionLifecycle(),
 	{
-		startPosition: 10,
 		args: ["sessionB"],
 	},
 );
@@ -112,7 +107,6 @@ const sessionBClazz = new DIClazz(
 	true,
 	new SessionLifecycle(),
 	{
-		startPosition: 10,
 		args: [],
 	},
 );

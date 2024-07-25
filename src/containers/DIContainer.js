@@ -1,5 +1,6 @@
 // todo: DIContainer interface - not abstract class. For base constructors create AbstractDIContainer class.
 class DIContainer {
+	constructor() {}
 	// _createInstance() { } // protected method
 
 	hasInstance() {}
