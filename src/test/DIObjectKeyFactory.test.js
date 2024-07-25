@@ -2,6 +2,7 @@ import { assert } from "chai";
 import DIObjectKeyFactory from "../containers/helpers/DIObjectKeyFactory.js";
 import ContextContainer from "../containers/ContextContainer.js";
 import SingletoneLifecycle from "../lifecycle/SingletoneLifecycle.js";
+import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 
 describe("DIObjectKeyFactory", () => {
 	describe("new DIObjectKeyFactory()", () => {
@@ -13,7 +14,7 @@ describe("DIObjectKeyFactory", () => {
 
 	describe("DIObjectKeyFactory.create()", () => {
 		const keyFactory = new DIObjectKeyFactory();
-		const context = new ContextContainer([]);
+		const context = ContextContainerFactory.createContainer([]);
 		const singletoneLifecycle = new SingletoneLifecycle();
 
 		it("create DIObjectKey instance by DIObjectKeyFactory.create() with no args", () => {

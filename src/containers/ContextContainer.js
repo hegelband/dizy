@@ -3,41 +3,13 @@ import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import SessionContainer from "./SessionContainer.js";
 import SingletoneContainer from "./SingletoneContainer.js";
 import DemandedFactory from "./DemandedFactory.js";
-import generateRandomString from "../utils/generateRandomString.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
-
-class NotUniqueContextContainerName extends Error {
-	constructor(name) {
-		super(`Context name '${name}' is not unique. Context name must be unique string.`);
-	}
-}
-
-class InvalidContextContainerNameType extends Error {
-	constructor() {
-		super(`Invalid context name type. Type of context name must be a string.`);
-	}
-}
 
 class ContextContainer extends AbstractContextContainer {
 	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
-		if (name === "") {
-			name = generateRandomString(7);
-		}
 		super(config, name, parent, keyFactory);
-		ContextContainer.#addName(name);
 		// this.#parent = parent;
 		// this.#keyFactory = keyFactory;
-	}
-
-	static #names = new Set();
-	static #addName(name) {
-		if (typeof name !== "string") {
-			throw new InvalidContextContainerNameType();
-		}
-		if (this.#names.has(name)) {
-			throw new NotUniqueContextContainerName(name);
-		}
-		this.#names.add(name);
 	}
 
 	// #parent;
@@ -50,13 +22,8 @@ class ContextContainer extends AbstractContextContainer {
 		const scopesTypes = new Set(this.classTreeList.map((cls) => cls.baseNode.lifecycle).sort((a, b) => b.id - a.id));
 		scopesTypes.forEach((lifecycle) => {
 			switch (lifecycle.id) {
-				// case LifecycleEnum.Persistent:
-				//     this.scopes.set(lifecycle, new PersistentContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Persistent)));
-				//     console.log(this.scopes);
-				//     break;
 				case LifecycleEnum.Session:
 					this.scopes.set(lifecycle.id, new SessionContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Session)));
-					// console.log(this.scopes);
 					break;
 				case LifecycleEnum.Singletone:
 					this.scopes.set(lifecycle.id, new SingletoneContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Singletone)));

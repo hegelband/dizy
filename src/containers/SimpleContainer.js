@@ -1,5 +1,5 @@
 import AbstractContextContainer from "./AbstractContextContainer.js";
-import DIContainer from "./DIContainer.js";
+import AbstractDIContainer from "./AbstractDIContainer.js";
 import InstanceHelper from "./helpers/InstanceHelper.js";
 
 class InvalidSimpleContainerParent extends Error {
@@ -10,7 +10,7 @@ class InvalidSimpleContainerParent extends Error {
 	}
 }
 
-class SimpleContainer extends DIContainer {
+class SimpleContainer extends AbstractDIContainer {
 	constructor(parent, classTreeList = []) {
 		if (!(parent instanceof AbstractContextContainer)) {
 			throw new InvalidSimpleContainerParent();
@@ -55,7 +55,6 @@ class SimpleContainer extends DIContainer {
 				if (existedInstance) {
 					return argumentValues.push(existedInstance);
 				}
-				console.log(argClazz.baseNode.name);
 				argumentValues.push(this._buildInstance(argClazz));
 			});
 		}

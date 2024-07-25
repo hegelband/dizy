@@ -1,5 +1,5 @@
 {
-	"editor.formatOnSave": true,
+	"editor.formatOnSave": false,
 	"editor.formatOnPaste": true,
 	"editor.codeActionsOnSave": {
 		// "source.organizeImports": "always",
@@ -9,4 +9,5 @@
 	"eslint.validate": [
 		"prettier"
 	],
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
 }

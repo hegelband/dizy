@@ -1,4 +1,3 @@
-
 import DIClazzModule from "./DIClazz.js";
 import {
 	DIObjectConfig as DIObjectConfigModule,
@@ -17,6 +16,8 @@ import DemandedLifecycleModule from "./lifecycle/DemandedLifecycle.js";
 import LifecycleModule from "./lifecycle/Lifecycle.js";
 import SessionLifecycleModule from "./lifecycle/SessionLifecycle.js";
 import SingletoneLifecycleModule from "./lifecycle/SingletoneLifecycle.js";
+import ContextContainerFactoryModule from "./containers/ContextContainerFactory.js";
+import AbstractContextContainerFactoryModule from "./containers/AbstractContextContainerFactory.js";
 
 const Dizy = {
 	ContextContainer: ContextContainerModule,
@@ -35,10 +36,14 @@ const Dizy = {
 	SingletoneLifecycle: SingletoneLifecycleModule,
 	SessionLifecycle: SessionLifecycleModule,
 	Lifecycle: LifecycleModule,
+	ContextContainerFactory: ContextContainerFactoryModule,
+	AbstractContextContainerFactory: AbstractContextContainerFactoryModule,
 };
 
 module.exports.ContextContainer = Dizy.ContextContainer;
 module.exports.AbstractContextContainer = Dizy.AbstractContextContainer;
+module.exports.ContextContainerFactory = Dizy.ContextContainerFactory;
+module.exports.AbstractContextContainerFactory = Dizy.AbstractContextContainerFactory;
 module.exports.DemandedConfig = Dizy.DemandedConfig;
 module.exports.SessionConfig = Dizy.SessionConfig;
 module.exports.SingletoneConfig = Dizy.SingletoneConfig;

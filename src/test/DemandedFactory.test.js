@@ -4,6 +4,7 @@ import DependencyTree from "../containers/helpers/DependencyTree.js";
 import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js"; // eslint-disable-line no-unused-vars
 import DemandedFactory from "../containers/DemandedFactory.js";
 import ContextContainer from "../containers/ContextContainer.js";
+import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 
 describe("DemandedFactory", () => {
 	describe("new DemandedFactory()", () => {
@@ -63,7 +64,7 @@ describe("DemandedFactory", () => {
 
 	describe("DemandedFactory.createInstance()", () => {
 		const clazzTrees = [new DependencyTree(DependencyTreeFixture.demBNode), new DependencyTree(DependencyTreeFixture.demANode)];
-		const context = new ContextContainer(DependencyTreeFixture.diConfig);
+		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
 		context.init();
 		const demandedContainer = new DemandedFactory(context, clazzTrees);
 		const instance = context.getInstance(DependencyTreeFixture.demANode.name);
@@ -71,7 +72,6 @@ describe("DemandedFactory", () => {
 		describe("DemandedFactory.createInstance(key of di object from this container)", () => {
 			it(`should return an instance of class A`, () => {
 				// const b = new DependencyTreeFixture.demBClazz.type();
-				// console.log(b);
 				// assert.deepEqual(instance, new DependencyTreeFixture.demAClazz.type(b));
 			});
 		});

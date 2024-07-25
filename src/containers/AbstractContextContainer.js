@@ -7,12 +7,12 @@ import {
 } from "../../ReflectionJs/index.js";
 // eslint-disable-next-line no-unused-vars
 import DIClazz from "../DIClazz.js";
-import { DIObjectConfig } from "../DIObjectConfig.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
+import InvalidAbstractContextConfig from "../errors/InvalidAbstractContextConfig.js";
 import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
 import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
-import DIContainer from "./DIContainer.js";
+import AbstractDIContainer from "./AbstractDIContainer.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 import DependencyTreeFactory from "./helpers/DependencyTreeFactory.js";
 
@@ -49,54 +49,18 @@ class DerivedClassConstructorArgsError extends Error {
 	}
 }
 
-class InvalidContextConfig extends Error {
-	constructor() {
-		super("Invalid context config. Config must be an array of DIObjectConfig instances");
-	}
-}
-
-class InvalidContextParent extends Error {
-	constructor() {
-		super("Invalid context parent. Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
-	}
-}
-
-class InvalidDIObjectKeyFactory extends Error {
-	constructor() {
-		super("Invalid context keyFactory. KeyFactory must be an instance of DIObjectKeyFactory or it's derived class");
-	}
-}
-
 class InvalidContextChild extends Error {
 	constructor() {
 		super("Invalid context child. Child must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
 	}
 }
 
-class AbstractContextContainer extends DIContainer {
+// ToDo: Create ContextContainerFactory and move creation logic.
+class AbstractContextContainer extends AbstractDIContainer {
 	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
-		if (!Array.isArray(config) || config.find((c) => !(c instanceof DIObjectConfig))) {
-			throw new InvalidContextConfig();
-		}
-		if (parent !== null && parent !== undefined && !(parent instanceof AbstractContextContainer)) {
-			throw new InvalidContextParent();
-		}
-		if (!name) {
-			throw new Error("Name of Context must be a non empty string.");
-		}
-		if (!(keyFactory instanceof DIObjectKeyFactory)) {
-			throw new InvalidDIObjectKeyFactory();
-		}
 		super(parent, []);
 		this.config = config;
 		this.name = name;
-		if (parent instanceof AbstractContextContainer) {
-			if (parent.getChildren().has(this.name)) {
-				throw new Error("Parent already has this context as a child.");
-			}
-			this.#parent = parent;
-			parent._addChild(this);
-		}
 		this.#keyFactory = keyFactory;
 	}
 
@@ -132,44 +96,52 @@ class AbstractContextContainer extends DIContainer {
 	}
 
 	#initClazzes() {
-		this.#clazzes = this.config.map((containerObject) => {
-			console.log(containerObject.type.toString());
-			const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
-			const typeOfContainerObject = parseType(containerObject.type);
-			if (typeOfContainerObject !== "class" && typeOfContainerObject !== "function" && typeOfContainerObject !== "function class") {
-				throw new NotAllowedDIObjectType(containerObject.type);
-			}
-			const isClass = typeOfContainerObject === "class" || typeOfContainerObject === "function class";
-			const constructorArgs =
-				typeOfContainerObject === "class"
-					? getClassConstructorArgsNames(containerObject.type)
-					: getFunctionArgsNames(containerObject.type);
-			const constructor = {
-				...constructorArgs,
-				args: constructorArgs.args.map((arg) => {
-					const defaultValue = getArgumentDefaultValue(arg);
-					if (defaultValue && defaultValue.value) {
-						console.log(defaultValue);
-						const obj = this.config.find((cls) => cls.type.name === defaultValue.value);
-						if (!obj) {
-							console.log(containerObject);
-							throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
-						}
-						return typeof obj.name === "symbol" ? Symbol.keyFor(obj.name) : obj.name;
+		this.#clazzes = this.config.map(this.#diClazzFromDIObjectConfig.bind(this));
+	}
+
+	#diClazzFromDIObjectConfig(containerObject) {
+		const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
+		const typeOfContainerObject = parseType(containerObject.type);
+		if (typeOfContainerObject !== "class" && typeOfContainerObject !== "function" && typeOfContainerObject !== "function class") {
+			throw new NotAllowedDIObjectType(containerObject.type);
+		}
+		const isClass = typeOfContainerObject === "class" || typeOfContainerObject === "function class";
+		const constructorArgs =
+			typeOfContainerObject === "class"
+				? { args: getClassConstructorArgsNames(containerObject.type).args }
+				: { args: getFunctionArgsNames(containerObject.type).args };
+		const constructor = {
+			...constructorArgs,
+			args: constructorArgs.args.map((arg) => {
+				const defaultValue = getArgumentDefaultValue(arg);
+				if (defaultValue && defaultValue.value) {
+					const obj = this.config.find((cls) => cls.type.name === defaultValue.value);
+					if (!obj) {
+						throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
 					}
-					return arg;
-				}),
-			};
-			return new DIClazz(
-				this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
-				objName,
-				containerObject.type,
-				isClass,
-				containerObject.lifecycle,
-				constructor,
-			);
-			// ToDo Правила жизненных циклов
-		});
+					return typeof obj.name === "symbol" ? Symbol.keyFor(obj.name) : obj.name;
+				}
+				return arg;
+			}),
+		};
+		return new DIClazz(
+			this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
+			objName,
+			containerObject.type,
+			isClass,
+			containerObject.lifecycle,
+			constructor,
+		);
+		// ToDo Правила жизненных циклов
+	}
+
+	addDIObject(diObjectConfig) {
+		if (!(diObjectConfig instanceof DIObjectConfig)) {
+			throw new InvalidAbstractContextConfig();
+		}
+		const diObjectClazz = this.#diClazzFromDIObjectConfig(diObjectConfig);
+		this.classTreeList.push(DependencyTreeFactory.createDependencyTree(diObjectClazz, this.#clazzes));
+		return true;
 	}
 
 	#initClassTreeList() {
@@ -222,6 +194,16 @@ class AbstractContextContainer extends DIContainer {
 		return this.#parent;
 	}
 
+	setParent(parent) {
+		if (parent instanceof AbstractContextContainer) {
+			if (parent.getChildren().has(this.name)) {
+				throw new Error("Parent already has this context as a child.");
+			}
+			this.#parent = parent;
+			parent.addChild(this);
+		}
+	}
+
 	_removeParent() {
 		this.#parent = null;
 	}
@@ -239,7 +221,7 @@ class AbstractContextContainer extends DIContainer {
 		return this.#children;
 	}
 
-	_addChild(childContext) {
+	addChild(childContext) {
 		if (!(childContext instanceof AbstractContextContainer)) {
 			throw new InvalidContextChild();
 		}
@@ -326,7 +308,6 @@ class AbstractContextContainer extends DIContainer {
 		if (parseType(clazz) !== "class") return true;
 		const baseClass = getBaseClass(clazz);
 		const isAnotherDIObject = this.config.findIndex((objConfig) => objConfig.type.name === baseClass.name) !== -1;
-		console.log(clazz.name, baseClass.name, isAnotherDIObject);
 		if (baseClass.name !== "Object") {
 			if (isAnotherDIObject) {
 				const clsConstructorArgs = getClassConstructorArgsNames(clazz).args;

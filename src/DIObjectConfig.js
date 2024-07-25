@@ -14,7 +14,7 @@ export class InvalidDIObjectName extends Error {
 
 export class InvalidDIObjectParent extends Error {
 	constructor() {
-		const message = "DI object parent must be an instance of ContextContainer.";
+		const message = "DI object parent must be an instance of AbstractContextContainer.";
 		super(message);
 		this.name = "InvalidDIObjectParent";
 	}

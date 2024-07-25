@@ -5,12 +5,14 @@ import AbstractContextContainer from "../containers/AbstractContextContainer.js"
 import { SingletoneConfig } from "../DIObjectConfig.js";
 import DependencyTree from "../containers/helpers/DependencyTree.js";
 import AbstractContextContainerFixture from "./fixtures/AbstractContextContainerFixture.js";
+import AbstractContextContainerFactory from "../containers/AbstractContextContainerFactory.js";
 
 describe("AbstractContextContainer", () => {
+	const factory = new AbstractContextContainerFactory();
 	describe("new AbstractContextContainer()", () => {
 		describe("create AbstractContextContainer without arguments", () => {
 			it(`should create an instance of AbstractContextContainer with arguments default values`, () => {
-				const createAbstractContext = () => new AbstractContextContainer([], "abstractContext");
+				const createAbstractContext = () => factory.createContainer([], "abstractContext");
 				assert.doesNotThrow(createAbstractContext, Error);
 				const context = createAbstractContext();
 				assert.equal(context.name, "abstractContext");
@@ -22,7 +24,7 @@ describe("AbstractContextContainer", () => {
 
 		describe("create AbstractContextContainer with invalid config", () => {
 			it(`should throw an error 'Invalid context config. Config must be an array of DIObjectConfig instances'`, () => {
-				const createAbstractContext = () => new AbstractContextContainer({ notDIObjectConfigArray: true });
+				const createAbstractContext = () => factory.createContainer({ notDIObjectConfigArray: true });
 				assert.throws(createAbstractContext, Error, "Invalid context config. Config must be an array of DIObjectConfig instances");
 			});
 		});
@@ -32,7 +34,7 @@ describe("AbstractContextContainer", () => {
 				'Invalid context parent. Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.'
 				`, () => {
 				const createAbstractContext = () =>
-					new AbstractContextContainer([], "abstractContext", {
+					factory.createContainer([], "abstractContext", {
 						parent: {},
 						name: "",
 						config: [],
@@ -52,7 +54,7 @@ describe("AbstractContextContainer", () => {
 				'Invalid context keyFactory. KeyFactory must be an instance of DIObjectKeyFactory or it's derived class'
 				`, () => {
 				const createAbstractContext = () =>
-					new AbstractContextContainer([], "abstractContext", null, {
+					factory.createContainer([], "abstractContext", null, {
 						createKey() {
 							return `@name`;
 						},
@@ -67,10 +69,10 @@ describe("AbstractContextContainer", () => {
 
 		describe("create AbstractContextContainer with valid arguments values", () => {
 			it(`should create an instance of AbstractContextContainer and set it's properties correctly`, () => {
-				const baseContext = new AbstractContextContainer([], "context");
+				const baseContext = factory.createContainer([], "context");
 				let context;
 				const createAbstractContext = () => {
-					context = new AbstractContextContainer(AbstractContextContainerFixture.diConfig, "correctName", baseContext);
+					context = factory.createContainer(AbstractContextContainerFixture.diConfig, "correctName", baseContext);
 				};
 				assert.doesNotThrow(createAbstractContext, Error);
 				assert.equal(context.getParent(), baseContext);
@@ -86,7 +88,7 @@ describe("AbstractContextContainer", () => {
 		// test for old version of #validateDIConfig, now it's test in 23 line
 		describe("AbstractContextContainer.init() with absolutely valid config", () => {
 			it("should set classTreeList correctly (list of DependencyTree instances)", () => {
-				const context = new AbstractContextContainer(AbstractContextContainerFixture.diConfig, "abstractContext");
+				const context = factory.createContainer(AbstractContextContainerFixture.diConfig, "abstractContext");
 				context.init();
 				const expected = [
 					new DependencyTree(AbstractContextContainerFixture.derivedNode),
@@ -136,7 +138,7 @@ describe("AbstractContextContainer", () => {
 					}
 
 					const diConfig = [new SingletoneConfig("nonameA", A), new SingletoneConfig("b", B)];
-					const context = new AbstractContextContainer(diConfig, "abstractContext");
+					const context = factory.createContainer(diConfig, "abstractContext");
 					const init = () => context.init();
 					assert.throws(
 						init,
@@ -161,7 +163,7 @@ describe("AbstractContextContainer", () => {
 				}
 
 				const diConfig = [new SingletoneConfig("a", A), new SingletoneConfig("b", B)];
-				const context = new AbstractContextContainer(diConfig, "abstractContext");
+				const context = factory.createContainer(diConfig, "abstractContext");
 				const init = () => context.init();
 				assert.throws(init, Error, `a requires b. And b requires a.`);
 			});
@@ -172,7 +174,7 @@ describe("AbstractContextContainer", () => {
 		// test for old version of #validateDIConfig, now it's test in 23 line
 		describe("AbstractContextContainer._findClassTree(name) with included name", () => {
 			it("should return classTree with correct name", () => {
-				const context = new AbstractContextContainer(AbstractContextContainerFixture.diConfig, "abstractContext");
+				const context = factory.createContainer(AbstractContextContainerFixture.diConfig, "abstractContext");
 				context.init();
 				const expectedList = [
 					new DependencyTree(AbstractContextContainerFixture.derivedNode),
