@@ -5,20 +5,21 @@ import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SessionContainer from "../containers/SessionContainer.js";
 import ContextContainer from "../containers/ContextContainer.js";
 import ContextContainerFactory from "../containers/ContextContainerFactory.js";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
 
 describe("SessionContainer", () => {
 	describe("new SessionContainer()", () => {
 		it(
 			"should throw an error " +
-				"'Invalid simple container parent. " +
-				"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.'",
+			"'Invalid simple container parent. " +
+			"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.'",
 			() => {
 				const funcThrowsError = () => new SessionContainer();
 				assert.throws(
 					funcThrowsError,
 					Error,
 					"Invalid simple container parent. " +
-						"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.",
+					"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.",
 				);
 			},
 		);
@@ -31,7 +32,7 @@ describe("SessionContainer", () => {
 				funcThrowsError,
 				Error,
 				"DIContainer constructor's argument 'classTreeList' is invalid. " +
-					"Argument 'classTreeList' must be an array of DependencyTree instances",
+				"Argument 'classTreeList' must be an array of DependencyTree instances",
 			);
 			assert.deepEqual(funcThrowsError().classTreeList, []);
 		});
@@ -45,7 +46,7 @@ describe("SessionContainer", () => {
 				funcThrowsError,
 				Error,
 				"DIContainer constructor's argument 'classTreeList' is invalid. " +
-					"Argument 'classTreeList' must be an array of DependencyTree instances",
+				"Argument 'classTreeList' must be an array of DependencyTree instances",
 			);
 		});
 	});
@@ -53,15 +54,15 @@ describe("SessionContainer", () => {
 	describe("new SessionContainer(context, [{ test: 1 }, { test: 2 }])", () => {
 		it(
 			"should throw an error " +
-				"'DIContainer constructor's argument 'classTreeList' is invalid. " +
-				"Argument 'classTreeList' must be an array of DependencyTree instances'",
+			"'DIContainer constructor's argument 'classTreeList' is invalid. " +
+			"Argument 'classTreeList' must be an array of DependencyTree instances'",
 			() => {
 				const funcThrowsError = () => new SessionContainer(DependencyTreeFixture.context, [{ test: 1 }, { test: 2 }]);
 				assert.throws(
 					funcThrowsError,
 					Error,
 					"DIContainer constructor's argument 'classTreeList' is invalid. " +
-						"Argument 'classTreeList' must be an array of DependencyTree instances",
+					"Argument 'classTreeList' must be an array of DependencyTree instances",
 				);
 			},
 		);
@@ -114,9 +115,9 @@ describe("SessionContainer", () => {
 	});
 
 	describe("SessionContainer.addInstance('stringKey', instance)", () => {
-		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
+		const context = DependencyTreeFixture.context;
 		context.init();
-		const sessionScope = new SessionContainer(context, []);
+		const sessionScope = new SessionContainer(context, context.classTreeList.filter(clsTree => clsTree.baseNode.lifecycle.id === LifecycleEnum.Session));
 
 		it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", () => {
 			const funcThrowsError = () => sessionScope.addInstance("stringKey", new DependencyTreeFixture.sessionBClazz.type());
