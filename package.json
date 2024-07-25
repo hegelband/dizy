@@ -15,6 +15,7 @@
 		"test:cover": "npm run instrument && cd ./nyc-instrument-output && nyc mocha",
 		"cover:report": "nyc report --reporter=lcov --reporter=text",
 		"clean-codecav": "rimraf coverage src/coverage",
+		"clean-repo-from-dev": "rimraf app.cjs index.html node.mjs vite.config.js src/index-dev.js src/modules",
 		"lint": "eslint --ext .js src --fix",
 		"start": "webpack serve --mode development --config webpack/dev.cjs",
 		"build": "webpack --config webpack/prod.cjs && webpack --config webpack/prod-esm.cjs"
