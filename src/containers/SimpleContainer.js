@@ -55,7 +55,6 @@ class SimpleContainer extends AbstractDIContainer {
 				if (existedInstance) {
 					return argumentValues.push(existedInstance);
 				}
-				// console.log(argClazz.baseNode.name);
 				argumentValues.push(this._buildInstance(argClazz));
 			});
 		}

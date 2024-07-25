@@ -18,9 +18,6 @@ class DIClazz {
 		if (!(lifecycle instanceof Lifecycle)) {
 			throw new Error("DIClazz constructor argument 'lifecycle' is invalid. Argument 'lifecycle' must be an instance of Lifecycle.");
 		}
-		// if (!Object.values(LifecycleEnum).find(v => v === lifecycle.id)) {
-		//     throw new UnregisteredDIObjectLifecycle(lifecycle);
-		// }
 		this.key = key;
 		this.name = name;
 		this.type = type;

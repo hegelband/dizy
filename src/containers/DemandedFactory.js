@@ -58,15 +58,12 @@ class DemandedFactory {
 		}
 		clazzTree.baseNode.lifecycle.beforeCreate();
 		const instance = InstanceHelper.createInstance(clazzTree.baseNode, argumentValues);
-		// console.log(instance);
 		clazzTree.baseNode.lifecycle.afterCreate.bind(instance)();
-		// console.log(clazzTree.baseNode.name, "new instance");
 		return instance;
 	}
 
 	createInstance(key) {
 		// create new instance and add it in Map
-		// console.log(key);
 		// const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
 		const clazz = this.classTreeList.find((cls) => cls.baseNode.key.key === key.key);
 		if (!clazz) {

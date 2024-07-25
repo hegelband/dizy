@@ -49,7 +49,6 @@ class SingletoneContainer extends SimpleContainer {
 		// const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
 		const clazz = this.classTreeList.find((cls) => cls.baseNode.key.key === key.key);
 		if (!clazz) {
-			// console.log("nonono");
 			return undefined;
 		}
 		return this.#buildInstance(clazz);

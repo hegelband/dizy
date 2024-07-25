@@ -22,13 +22,8 @@ class ContextContainer extends AbstractContextContainer {
 		const scopesTypes = new Set(this.classTreeList.map((cls) => cls.baseNode.lifecycle).sort((a, b) => b.id - a.id));
 		scopesTypes.forEach((lifecycle) => {
 			switch (lifecycle.id) {
-				// case LifecycleEnum.Persistent:
-				//     this.scopes.set(lifecycle, new PersistentContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Persistent)));
-				//     console.log(this.scopes);
-				//     break;
 				case LifecycleEnum.Session:
 					this.scopes.set(lifecycle.id, new SessionContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Session)));
-					// console.log(this.scopes);
 					break;
 				case LifecycleEnum.Singletone:
 					this.scopes.set(lifecycle.id, new SingletoneContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Singletone)));

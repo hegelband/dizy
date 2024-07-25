@@ -8,6 +8,7 @@ import {
 // eslint-disable-next-line no-unused-vars
 import DIClazz from "../DIClazz.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
+import InvalidAbstractContextConfig from "../errors/InvalidAbstractContextConfig.js";
 import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
 import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
@@ -95,44 +96,52 @@ class AbstractContextContainer extends AbstractDIContainer {
 	}
 
 	#initClazzes() {
-		this.#clazzes = this.config.map((containerObject) => {
-			// console.log(containerObject.type.toString());
-			const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
-			const typeOfContainerObject = parseType(containerObject.type);
-			if (typeOfContainerObject !== "class" && typeOfContainerObject !== "function" && typeOfContainerObject !== "function class") {
-				throw new NotAllowedDIObjectType(containerObject.type);
-			}
-			const isClass = typeOfContainerObject === "class" || typeOfContainerObject === "function class";
-			const constructorArgs =
-				typeOfContainerObject === "class"
-					? { args: getClassConstructorArgsNames(containerObject.type).args }
-					: { args: getFunctionArgsNames(containerObject.type).args };
-			const constructor = {
-				...constructorArgs,
-				args: constructorArgs.args.map((arg) => {
-					const defaultValue = getArgumentDefaultValue(arg);
-					if (defaultValue && defaultValue.value) {
-						// console.log(defaultValue);
-						const obj = this.config.find((cls) => cls.type.name === defaultValue.value);
-						if (!obj) {
-							// console.log(containerObject);
-							throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
-						}
-						return typeof obj.name === "symbol" ? Symbol.keyFor(obj.name) : obj.name;
+		this.#clazzes = this.config.map(this.#diClazzFromDIObjectConfig.bind(this));
+	}
+
+	#diClazzFromDIObjectConfig(containerObject) {
+		const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
+		const typeOfContainerObject = parseType(containerObject.type);
+		if (typeOfContainerObject !== "class" && typeOfContainerObject !== "function" && typeOfContainerObject !== "function class") {
+			throw new NotAllowedDIObjectType(containerObject.type);
+		}
+		const isClass = typeOfContainerObject === "class" || typeOfContainerObject === "function class";
+		const constructorArgs =
+			typeOfContainerObject === "class"
+				? { args: getClassConstructorArgsNames(containerObject.type).args }
+				: { args: getFunctionArgsNames(containerObject.type).args };
+		const constructor = {
+			...constructorArgs,
+			args: constructorArgs.args.map((arg) => {
+				const defaultValue = getArgumentDefaultValue(arg);
+				if (defaultValue && defaultValue.value) {
+					const obj = this.config.find((cls) => cls.type.name === defaultValue.value);
+					if (!obj) {
+						throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
 					}
-					return arg;
-				}),
-			};
-			return new DIClazz(
-				this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
-				objName,
-				containerObject.type,
-				isClass,
-				containerObject.lifecycle,
-				constructor,
-			);
-			// ToDo Правила жизненных циклов
-		});
+					return typeof obj.name === "symbol" ? Symbol.keyFor(obj.name) : obj.name;
+				}
+				return arg;
+			}),
+		};
+		return new DIClazz(
+			this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
+			objName,
+			containerObject.type,
+			isClass,
+			containerObject.lifecycle,
+			constructor,
+		);
+		// ToDo Правила жизненных циклов
+	}
+
+	addDIObject(diObjectConfig) {
+		if (!(diObjectConfig instanceof DIObjectConfig)) {
+			throw new InvalidAbstractContextConfig();
+		}
+		const diObjectClazz = this.#diClazzFromDIObjectConfig(diObjectConfig);
+		this.classTreeList.push(DependencyTreeFactory.createDependencyTree(diObjectClazz, this.#clazzes));
+		return true;
 	}
 
 	#initClassTreeList() {
@@ -299,7 +308,6 @@ class AbstractContextContainer extends AbstractDIContainer {
 		if (parseType(clazz) !== "class") return true;
 		const baseClass = getBaseClass(clazz);
 		const isAnotherDIObject = this.config.findIndex((objConfig) => objConfig.type.name === baseClass.name) !== -1;
-		// console.log(clazz.name, baseClass.name, isAnotherDIObject);
 		if (baseClass.name !== "Object") {
 			if (isAnotherDIObject) {
 				const clsConstructorArgs = getClassConstructorArgsNames(clazz).args;
