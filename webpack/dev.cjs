@@ -11,6 +11,7 @@ module.exports = merge(base, {
 	output: {
 		path: path.resolve(__dirname, "../dist"),
 	},
+	devtool: "source-map",
 	mode: "development",
 	devServer: {
 		historyApiFallback: true,

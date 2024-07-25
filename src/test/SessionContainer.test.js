@@ -4,6 +4,7 @@ import DependencyTree from "../containers/helpers/DependencyTree.js";
 import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SessionContainer from "../containers/SessionContainer.js";
 import ContextContainer from "../containers/ContextContainer.js";
+import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 
 describe("SessionContainer", () => {
 	describe("new SessionContainer()", () => {
@@ -72,7 +73,7 @@ describe("SessionContainer", () => {
 				new DependencyTree(DependencyTreeFixture.sessionANode),
 				new DependencyTree(new DependencyTreeNode(DependencyTreeFixture.sessionBClazz, 0, [])),
 			];
-			const context = new ContextContainer(DependencyTreeFixture.diConfig);
+			const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
 			context.init();
 			const sessionScope = new SessionContainer(context, clazzTrees);
 			const instance = sessionScope.getInstance(DependencyTreeFixture.sessionANode.key);
@@ -85,7 +86,7 @@ describe("SessionContainer", () => {
 			new DependencyTree(DependencyTreeFixture.sessionANode),
 			new DependencyTree(new DependencyTreeNode(DependencyTreeFixture.sessionBClazz, 0, [])),
 		];
-		const context = new ContextContainer(DependencyTreeFixture.diConfig);
+		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
 		context.init();
 		const sessionScope = new SessionContainer(context, clazzTrees);
 		sessionScope.init();
@@ -113,7 +114,7 @@ describe("SessionContainer", () => {
 	});
 
 	describe("SessionContainer.addInstance('stringKey', instance)", () => {
-		const context = new ContextContainer(DependencyTreeFixture.diConfig);
+		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
 		context.init();
 		const sessionScope = new SessionContainer(context, []);
 

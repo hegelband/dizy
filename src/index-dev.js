@@ -3,12 +3,12 @@ import {
 	SessionConfig as SessionConfigModule,
 	SingletoneConfig as SingletoneConfigModule,
 } from "./DIObjectConfig.js";
-import ContextContainerModule from "./containers/ContextContainer.js";
 import Window from "./modules/Window.js";
 import Button from "./modules/Button.js";
 import SideBar from "./modules/SideBar.js";
 import dot from "./modules/dot.js";
 import rectangle from "./modules/rectangle.js";
+import ContextContainerFactory from "./containers/ContextContainerFactory.js";
 
 const names = {
 	windowName: Symbol.for("window"),
@@ -34,8 +34,8 @@ const DIConfig = [
 
 const DISecondConfig = [new SessionConfigModule("dot", dot), new SessionConfigModule(names.rectangleName, rectangle)];
 
-const appContext = new ContextContainerModule(DIConfig, "app context");
-const appSecondContext = new ContextContainerModule(DISecondConfig, "app second context", appContext);
+const appContext = ContextContainerFactory.createContainer(DIConfig, "app context");
+const appSecondContext = ContextContainerFactory.createContainer(DISecondConfig, "app second context", appContext);
 
 appContext.init();
 appSecondContext.init();

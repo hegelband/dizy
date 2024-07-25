@@ -1,8 +1,9 @@
 import ContextContainer from "../../containers/ContextContainer.js";
+import ContextContainerFactory from "../../containers/ContextContainerFactory.js";
 import DIObjectKeyFactory from "../../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../../lifecycle/SingletoneLifecycle.js";
 
-const context = new ContextContainer([], "context");
+const context = ContextContainerFactory.createContainer([], "context");
 class A {
 	constructor(b) {
 		this.b = b;
@@ -19,7 +20,6 @@ export default {
 	isClass: true,
 	lifecycle: new SingletoneLifecycle(),
 	constructor: {
-		startPosition: 10,
 		args: ["b"],
 	},
 	key: new DIObjectKeyFactory().createKey(context, "b", new SingletoneLifecycle(), true),
@@ -28,7 +28,6 @@ export default {
 	isClass: true,
 	lifecycle: new SingletoneLifecycle(),
 	constructor: {
-		startPosition: 10,
 		args: [],
 	},
 };

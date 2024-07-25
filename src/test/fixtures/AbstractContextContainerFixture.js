@@ -6,7 +6,7 @@ import DependencyTreeNode from "../../containers/helpers/DependencyTreeNode.js";
 import { DemandedConfig, SessionConfig, SingletoneConfig } from "../../DIObjectConfig.js";
 import DemandedLifecycle from "../../lifecycle/DemandedLifecycle.js";
 import SessionLifecycle from "../../lifecycle/SessionLifecycle.js";
-import AbstractContextContainer from "../../containers/AbstractContextContainer.js";
+import AbstractContextContainerFactory from "../../containers/AbstractContextContainerFactory.js";
 
 class A {
 	constructor(b) {
@@ -43,7 +43,8 @@ const diConfig = [
 	new SessionConfig("sessionA", SessionA),
 	new SessionConfig("sessionB", SessionB),
 ];
-const context = new AbstractContextContainer(diConfig, "abstractContext");
+const factory = new AbstractContextContainerFactory();
+const context = factory.createContainer(diConfig, "abstractContext");
 
 const baseClazz = new DIClazz(
 	new DIObjectKeyFactory().createKey(context, "nonameA", new SingletoneLifecycle(), true),
@@ -52,7 +53,6 @@ const baseClazz = new DIClazz(
 	true,
 	new SingletoneLifecycle(),
 	{
-		startPosition: 11,
 		args: ["b"],
 	},
 );
@@ -64,7 +64,6 @@ const derivedClazz = new DIClazz(
 	true,
 	new SingletoneLifecycle(),
 	{
-		startPosition: 11,
 		args: [],
 	},
 );
@@ -76,7 +75,6 @@ const demandedAClazz = new DIClazz(
 	true,
 	new DemandedLifecycle(),
 	{
-		startPosition: 19,
 		args: ["demandedB"],
 	},
 );
@@ -88,7 +86,6 @@ const demandedBClazz = new DIClazz(
 	true,
 	new DemandedLifecycle(),
 	{
-		startPosition: 19,
 		args: [],
 	},
 );
@@ -100,7 +97,6 @@ const sessionAClazz = new DIClazz(
 	true,
 	new SessionLifecycle(),
 	{
-		startPosition: 18,
 		args: ["sessionB"],
 	},
 );
@@ -112,7 +108,6 @@ const sessionBClazz = new DIClazz(
 	true,
 	new SessionLifecycle(),
 	{
-		startPosition: 18,
 		args: [],
 	},
 );

@@ -4,6 +4,7 @@ import DependencyTree from "../containers/helpers/DependencyTree.js";
 import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SingletoneContainer from "../containers/SingletoneContainer.js";
 import ContextContainer from "../containers/ContextContainer.js";
+import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 
 describe("SingletoneContainer", () => {
 	describe("new SingletoneContainer()", () => {
@@ -71,7 +72,7 @@ describe("SingletoneContainer", () => {
 			new DependencyTree(DependencyTreeFixture.baseNode),
 			new DependencyTree(new DependencyTreeNode(DependencyTreeFixture.derivedClazz, 0, [])),
 		];
-		const context = new ContextContainer(DependencyTreeFixture.diConfig);
+		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
 		context.init();
 		const simpleContainer = new SingletoneContainer(context, clazzTrees);
 		const instance = simpleContainer.getInstance(DependencyTreeFixture.baseNode.key);
@@ -98,7 +99,7 @@ describe("SingletoneContainer", () => {
 	});
 
 	describe("SingletoneContainer.addInstance('stringKey', instance)", () => {
-		const context = new ContextContainer(DependencyTreeFixture.diConfig);
+		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
 		context.init();
 		const simpleContainer = new SingletoneContainer(context, []);
 

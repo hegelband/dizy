@@ -9,12 +9,13 @@ import DemandedFactory from "../containers/DemandedFactory.js";
 import SessionLifecycle from "../lifecycle/SessionLifecycle.js";
 import DemandedLifecycle from "../lifecycle/DemandedLifecycle.js";
 import SingletoneLifecycle from "../lifecycle/SingletoneLifecycle.js";
+import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 
 describe("ContextContainer", () => {
 	describe("new ContextContainer()", () => {
 		describe("create ContextContainer without arguments", () => {
 			it(`should create an instance of ContextContainer with arguments default values`, () => {
-				const createAbstractContext = (name = "") => new ContextContainer([], name);
+				const createAbstractContext = (name = "") => ContextContainerFactory.createContainer([], name);
 				assert.doesNotThrow(createAbstractContext, Error);
 				const context = createAbstractContext("uniqueContext");
 				assert.equal(context.name, "uniqueContext");
@@ -26,7 +27,7 @@ describe("ContextContainer", () => {
 
 		describe("create ContextContainer with invalid config", () => {
 			it(`should throw an error 'Invalid context config. Config must be an array of DIObjectConfig instances'`, () => {
-				const createContext = () => new ContextContainer({ notDIObjectConfigArray: true });
+				const createContext = () => ContextContainerFactory.createContainer({ notDIObjectConfigArray: true });
 				assert.throws(createContext, Error, "Invalid context config. Config must be an array of DIObjectConfig instances");
 			});
 		});
@@ -37,7 +38,7 @@ describe("ContextContainer", () => {
 					Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.'
 				`, () => {
 				const createContext = () =>
-					new ContextContainer([], "uniqueContext1", {
+					ContextContainerFactory.createContainer([], "uniqueContext1", {
 						parent: {},
 						name: "",
 						config: [],
@@ -57,7 +58,7 @@ describe("ContextContainer", () => {
 					'Invalid context keyFactory. KeyFactory must be an instance of DIObjectKeyFactory or it's derived class'
 				`, () => {
 				const createContext = () =>
-					new ContextContainer([], "uniqueContext2", null, {
+					ContextContainerFactory.createContainer([], "uniqueContext2", null, {
 						createKey() {
 							return `@name`;
 						},
@@ -72,8 +73,8 @@ describe("ContextContainer", () => {
 
 		describe("create ContextContainer with valid arguments values", () => {
 			it(`should create an instance of ContextContainer and set it's properties correctly`, () => {
-				const baseContext = new ContextContainer([], "uniqueContext3");
-				const createContext = (name = "") => new ContextContainer(AbstractContextContainerFixture.diConfig, name, baseContext);
+				const baseContext = ContextContainerFactory.createContainer([], "uniqueContext3");
+				const createContext = (name = "") => ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, name, baseContext);
 				assert.doesNotThrow(createContext, Error);
 				const context = createContext("correctName");
 				assert.equal(context.getParent(), baseContext);
@@ -85,7 +86,7 @@ describe("ContextContainer", () => {
 		});
 	});
 
-	const commonContext = new ContextContainer(AbstractContextContainerFixture.diConfig, "abstractContext");
+	const commonContext = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "abstractContext");
 	commonContext.init();
 	const commonExpectedList = [
 		new DependencyTree(AbstractContextContainerFixture.derivedNode),
@@ -173,7 +174,7 @@ describe("ContextContainer", () => {
 					}
 
 					const diConfig = [new SingletoneConfig("nonameA", A), new SingletoneConfig("b", B)];
-					const context = new ContextContainer(diConfig, "uniqueContext5");
+					const context = ContextContainerFactory.createContainer(diConfig, "uniqueContext5");
 					const init = () => context.init();
 					assert.throws(
 						init,
@@ -198,7 +199,7 @@ describe("ContextContainer", () => {
 				}
 
 				const diConfig = [new SingletoneConfig("a", A), new SingletoneConfig("b", B)];
-				const context = new ContextContainer(diConfig, "uniqueContext6");
+				const context = ContextContainerFactory.createContainer(diConfig, "uniqueContext6");
 				const init = () => context.init();
 				assert.throws(init, Error, `a requires b. And b requires a.`);
 			});
@@ -282,7 +283,7 @@ describe("ContextContainer", () => {
 
 		describe("ContextContainer.getInstance(name) before context initialization", () => {
 			it("should return undefined", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for check getInstance before init");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for check getInstance before init");
 				context.init();
 				assert.equal(context.getInstance("a"), undefined);
 			});
@@ -290,7 +291,7 @@ describe("ContextContainer", () => {
 
 		describe("ContextContainer.getInstance(name) with not existed name", () => {
 			it("should return undefined", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting undefined");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting undefined");
 				context.init();
 				assert.equal(context.getInstance("test undefined name"), undefined);
 			});
@@ -298,7 +299,7 @@ describe("ContextContainer", () => {
 
 		describe("ContextContainer.getInstance(name) with name of Singletone", () => {
 			it("should return an instance of singletone", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting singletone");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting singletone");
 				context.init();
 				commonExpectedList.filter(filterSingletone).forEach((tree, index) => {
 					assert.deepEqual(context.getInstance(tree.baseNode.name), commonInstances.filter(filterSingletone)[index]);
@@ -308,7 +309,7 @@ describe("ContextContainer", () => {
 
 		describe("second call ContextContainer.getInstance(name) with name of Singletone", () => {
 			it("should return the same instance of singletone", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting singletone two times");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting singletone two times");
 				context.init();
 				commonExpectedList.filter(filterSingletone).forEach((tree) => {
 					const firstInstance = context.getInstance(tree.baseNode.name);
@@ -319,7 +320,7 @@ describe("ContextContainer", () => {
 
 		describe("ContextContainer.getInstance(name) with name of Session", () => {
 			it("should return an instance of session", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting session");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting session");
 				context.init();
 				commonExpectedList.filter(filterSession).forEach((tree, index) => {
 					assert.deepEqual(context.getInstance(tree.baseNode.name), commonInstances.filter(filterSession)[index]);
@@ -329,7 +330,7 @@ describe("ContextContainer", () => {
 
 		describe("second call ContextContainer.getInstance(name) with name of Session", () => {
 			it("should return the same instance of session", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting session two times");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting session two times");
 				context.init();
 				commonExpectedList.filter(filterSession).forEach((tree) => {
 					const firstInstance = context.getInstance(tree.baseNode.name);
@@ -340,7 +341,7 @@ describe("ContextContainer", () => {
 
 		describe("ContextContainer.getInstance(name) with name of Demanded", () => {
 			it("should return an instance of demanded", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting demanded");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting demanded");
 				context.init();
 				commonExpectedList.filter(filterDemanded).forEach((tree, index) => {
 					assert.deepEqual(context.getInstance(tree.baseNode.name), commonInstances.filter(filterDemanded)[index]);
@@ -350,7 +351,7 @@ describe("ContextContainer", () => {
 
 		describe("second call ContextContainer.getInstance(name) with name of Demanded", () => {
 			it("should return another instance of demanded", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "context for getting demanded 2 times");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "context for getting demanded 2 times");
 				context.init();
 				commonExpectedList.filter(filterDemanded).forEach((tree) => {
 					const firstInstance = context.getInstance(tree.baseNode.name);
@@ -361,12 +362,12 @@ describe("ContextContainer", () => {
 
 		describe("ContextContainer.getInstance(name) with name of Demanded", () => {
 			it("should return an instance of demanded", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "base context");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "base context");
 				class ChildSingletone {
 					constructor() {}
 				}
 				// eslint-disable-next-line no-unused-vars
-				const childContext = new ContextContainer([new SingletoneConfig("child singletone", ChildSingletone)], "child context", context);
+				const childContext = ContextContainerFactory.createContainer([new SingletoneConfig("child singletone", ChildSingletone)], "child context", context);
 				context.init();
 				assert.instanceOf(context.getInstance("child singletone"), ChildSingletone);
 			});
@@ -403,11 +404,11 @@ describe("ContextContainer", () => {
 
 		describe("call ContextContainer.getChildren() with non empty children", () => {
 			it("should return empty Map", () => {
-				const context = new ContextContainer(AbstractContextContainerFixture.diConfig, "parent context");
+				const context = ContextContainerFactory.createContainer(AbstractContextContainerFixture.diConfig, "parent context");
 				class ChildSingletone {
 					constructor() {}
 				}
-				const childContext = new ContextContainer(
+			const childContext = ContextContainerFactory.createContainer(
 					[new SingletoneConfig("child singletone", ChildSingletone)],
 					"parents child context",
 					context,
