@@ -1,0 +1,38 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      # Your original steps
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: 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
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.12.0
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm run test:cover
+      - name: Coverage
+        run: npm run cover:report
+
+      # Add this
+      # - name: Update Coverage Badge
+      #   # GitHub actions: default branch variable
+      #   # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
+      #   if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      #   uses: we-cli/coverage-badge-action@main
