@@ -15,6 +15,7 @@
 		"test:cover": "npm run instrument && cd ./nyc-instrument-output && nyc mocha",
 		"cover:report": "nyc report --reporter=lcov --reporter=text",
 		"clean-codecav": "rimraf coverage src/coverage",
+		"clean-repo-from-dev": "rimraf app.cjs index.html node.mjs vite.config.js src/index-dev.js src/modules",
 		"lint": "eslint --ext .js src --fix",
 		"prettier-check": "prettier --check src/**/*.{js,cjs,mjs}",
 		"prettier-write": "prettier --write src/**/*.{js,cjs,mjs}",

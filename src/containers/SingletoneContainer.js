@@ -17,6 +17,13 @@ class SingletoneContainer extends SimpleContainer {
 	#parent;
 	#instances = new InstancesMap();
 
+	addDIObject(diObjectClazzTree) {
+		if (diObjectClazzTree.baseNode.lifecycle.id !== LifecycleEnum.Singletone) {
+			throw new ContainerHasClassWithInvalidLifecycle("Singletone", diObjectClazzTree);
+		}
+		super.addDIObject(diObjectClazzTree);
+	}
+
 	#buildInstance(clazz) {
 		clazz.baseNode.lifecycle.beforeCreate();
 		const instance = this._buildInstance(clazz);

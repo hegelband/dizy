@@ -7,6 +7,7 @@ import {
 } from "../../ReflectionJs/index.js";
 // eslint-disable-next-line no-unused-vars
 import DIClazz from "../DIClazz.js";
+import { DIObjectConfig } from "../DIObjectConfig.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
 import InvalidAbstractContextConfig from "../errors/InvalidAbstractContextConfig.js";
 import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
@@ -139,9 +140,12 @@ class AbstractContextContainer extends AbstractDIContainer {
 		if (!(diObjectConfig instanceof DIObjectConfig)) {
 			throw new InvalidAbstractContextConfig();
 		}
+		this.config.push(diObjectConfig);
 		const diObjectClazz = this.#diClazzFromDIObjectConfig(diObjectConfig);
-		this.classTreeList.push(DependencyTreeFactory.createDependencyTree(diObjectClazz, this.#clazzes));
-		return true;
+		this.#clazzes.push(diObjectClazz);
+		const tree = DependencyTreeFactory.createDependencyTree(diObjectClazz, this.#clazzes);
+		this.classTreeList.push(tree);
+		return tree;
 	}
 
 	#initClassTreeList() {

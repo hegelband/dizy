@@ -62,6 +62,13 @@ class DemandedFactory {
 		return instance;
 	}
 
+	addDIObject(diObjectClazzTree) {
+		if (diObjectClazzTree.baseNode.lifecycle.id !== LifecycleEnum.Demanded) {
+			throw new ContainerHasClassWithInvalidLifecycle("Demanded", diObjectClazzTree);
+		}
+		this.classTreeList.push(diObjectClazzTree);
+	}
+
 	createInstance(key) {
 		// create new instance and add it in Map
 		// const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
