@@ -90,7 +90,7 @@ const demBClazz = new DIClazz(
 );
 
 const sessionAClazz = new DIClazz(
-	new DIObjectKeyFactory().createKey(context, "demA", new SessionLifecycle(), true),
+	new DIObjectKeyFactory().createKey(context, "sessionA", new SessionLifecycle(), true),
 	"sessionA",
 	SessionA,
 	true,
@@ -101,7 +101,7 @@ const sessionAClazz = new DIClazz(
 );
 
 const sessionBClazz = new DIClazz(
-	new DIObjectKeyFactory().createKey(context, "demB", new SessionLifecycle(), true),
+	new DIObjectKeyFactory().createKey(context, "sessionB", new SessionLifecycle(), true),
 	"sessionB",
 	SessionB,
 	true,

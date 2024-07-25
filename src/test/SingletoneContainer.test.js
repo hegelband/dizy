@@ -5,6 +5,7 @@ import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SingletoneContainer from "../containers/SingletoneContainer.js";
 import ContextContainer from "../containers/ContextContainer.js";
 import ContextContainerFactory from "../containers/ContextContainerFactory.js";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
 
 describe("SingletoneContainer", () => {
 	describe("new SingletoneContainer()", () => {
@@ -99,9 +100,9 @@ describe("SingletoneContainer", () => {
 	});
 
 	describe("SingletoneContainer.addInstance('stringKey', instance)", () => {
-		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
+		const context = DependencyTreeFixture.context;
 		context.init();
-		const simpleContainer = new SingletoneContainer(context, []);
+		const simpleContainer = new SingletoneContainer(context, context.classTreeList.filter(clsTree => clsTree.baseNode.lifecycle.id === LifecycleEnum.Singletone));
 
 		it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", () => {
 			const funcThrowsError = () => simpleContainer.addInstance("stringKey", new DependencyTreeFixture.derivedClazz.type());

@@ -5,6 +5,7 @@ import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SessionContainer from "../containers/SessionContainer.js";
 import ContextContainer from "../containers/ContextContainer.js";
 import ContextContainerFactory from "../containers/ContextContainerFactory.js";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
 
 describe("SessionContainer", () => {
 	describe("new SessionContainer()", () => {
@@ -114,9 +115,9 @@ describe("SessionContainer", () => {
 	});
 
 	describe("SessionContainer.addInstance('stringKey', instance)", () => {
-		const context = ContextContainerFactory.createContainer(DependencyTreeFixture.diConfig);
+		const context = DependencyTreeFixture.context;
 		context.init();
-		const sessionScope = new SessionContainer(context, []);
+		const sessionScope = new SessionContainer(context, context.classTreeList.filter(clsTree => clsTree.baseNode.lifecycle.id === LifecycleEnum.Session));
 
 		it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", () => {
 			const funcThrowsError = () => sessionScope.addInstance("stringKey", new DependencyTreeFixture.sessionBClazz.type());
