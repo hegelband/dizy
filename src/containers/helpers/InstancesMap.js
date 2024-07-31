@@ -5,24 +5,34 @@ class InstancesMap extends Map {
 		super();
 	}
 
-	getBySymbol(symbolKey) {
-		let instance = undefined;
-		this.forEach((value, key) => {
-			if (deepEqual(Symbol.keyFor(key), Symbol.keyFor(symbolKey))) {
-				instance = value;
-			}
-		});
-		return instance;
+	get(symbolKey) {
+		if (typeof symbolKey === 'object' || typeof symbolKey === "symbol") {
+			let instance = undefined;
+			this.forEach((value, key) => {
+				const elemKey = typeof key === "symbol" ? Symbol.keyFor(key) : key;
+				const k = typeof symbolKey === "symbol" ? Symbol.keyFor(symbolKey) : symbolKey;
+				if (deepEqual(elemKey, k)) {
+					instance = value;
+				}
+			});
+			return instance;
+		}
+		return super.get(symbolKey);
 	}
 
-	hasBySymbol(symbolKey) {
-		let isExist = false;
-		this.forEach((value, key) => {
-			if (deepEqual(Symbol.keyFor(key), Symbol.keyFor(symbolKey))) {
-				isExist = true;
-			}
-		});
-		return isExist;
+	has(symbolKey) {
+		if (typeof symbolKey === 'object' || typeof symbolKey === "symbol") {
+			let isExist = false;
+			this.forEach((value, key) => {
+				const elemKey = typeof key === "symbol" ? Symbol.keyFor(key) : key;
+				const k = typeof symbolKey === "symbol" ? Symbol.keyFor(symbolKey) : symbolKey;
+				if (deepEqual(elemKey, k)) {
+					isExist = true;
+				}
+			});
+			return isExist;
+		}
+		return super.has(symbolKey);
 	}
 }
 

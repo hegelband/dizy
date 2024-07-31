@@ -52,7 +52,7 @@ class SingletoneContainer extends SimpleContainer {
 	}
 
 	getInstance(key) {
-		// const existed = this.#instances.getBySymbol(key.key);
+		// const existed = this.#instances.get(key.key);
 		const existed = this.#instances.get(key.key);
 		if (existed) {
 			return existed;
