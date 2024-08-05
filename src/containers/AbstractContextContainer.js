@@ -49,14 +49,34 @@ class DerivedClassConstructorArgsError extends Error {
 	}
 }
 
+/** Class representing an error thrown when child of di context isn't an instance of AbstractContextContainer.
+ * @class
+ * @extends Error
+ */
 class InvalidContextChild extends Error {
 	constructor() {
 		super("Invalid context child. Child must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
 	}
 }
 
-// ToDo: Create ContextContainerFactory and move creation logic.
+/** Abstract Class for context - AbstractContextContainer.
+ * It takes config and generates dependency trees, validate it, create
+ * @class
+ * @abstract
+ * @extends AbstractDIContainer
+ *
+ * @property {DependencyTree[]} classTreeList - list of di objects dependency tree.
+ * @property {Map} scopes - Map of Simple DI Containers, like SingletoneContainer, SessionContainer, DemandedFactory.
+ * @property
+ *
+ */
 class AbstractContextContainer extends AbstractDIContainer {
+	/**
+	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
+	 * @param {string} [name=""] - name of context
+	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
+	 */
 	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
 		super(parent, []);
 		this.config = config;
@@ -64,16 +84,34 @@ class AbstractContextContainer extends AbstractDIContainer {
 		this.#keyFactory = keyFactory;
 	}
 
+	/** Is context ready for work?
+	 * @type {boolean}
+	 * @private
+	 */
 	#contextReady = false;
+
 	#parent;
 	#keyFactory;
+
+	/** List of DIObjectClazz.
+	 * @type {DIClazz[]}
+	 * @private
+	 */
 	#clazzes = [];
+
+	/** Map of AbstractContextContainer.
+	 * @type {Map<AbstractContextContainer>}
+	 * @private
+	 */
 	#children = new Map();
 
 	classTreeList = [];
 
 	scopes = new Map();
 
+	/** Init context container: validate config, define classTreeList, create and init scopes and children.
+	 * @public
+	 */
 	init() {
 		// this.#validateDIConfig();
 		if (this.#contextReady) return;
@@ -95,10 +133,19 @@ class AbstractContextContainer extends AbstractDIContainer {
 		this.#contextReady = true;
 	}
 
+	/** Init clazzes
+	 * @private
+	 */
 	#initClazzes() {
 		this.#clazzes = this.config.map(this.#diClazzFromDIObjectConfig.bind(this));
 	}
 
+	/** Returns DIClazz created from DIObjectConfig
+	 * @private
+	 *
+	 * @param {DIObjectConfig} containerObject - config of di object like SingletoneConfig, SessionConfig or DemandedConfig
+	 * @returns {DIClazz}
+	 */
 	#diClazzFromDIObjectConfig(containerObject) {
 		const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
 		const typeOfContainerObject = parseType(containerObject.type);
