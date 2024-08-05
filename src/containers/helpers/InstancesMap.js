@@ -6,7 +6,7 @@ class InstancesMap extends Map {
 	}
 
 	get(symbolKey) {
-		if (typeof symbolKey === 'object' || typeof symbolKey === "symbol") {
+		if (typeof symbolKey === "object" || typeof symbolKey === "symbol") {
 			let instance = undefined;
 			this.forEach((value, key) => {
 				const elemKey = typeof key === "symbol" ? Symbol.keyFor(key) : key;
@@ -21,7 +21,7 @@ class InstancesMap extends Map {
 	}
 
 	has(symbolKey) {
-		if (typeof symbolKey === 'object' || typeof symbolKey === "symbol") {
+		if (typeof symbolKey === "object" || typeof symbolKey === "symbol") {
 			let isExist = false;
 			this.forEach((value, key) => {
 				const elemKey = typeof key === "symbol" ? Symbol.keyFor(key) : key;

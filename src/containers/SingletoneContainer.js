@@ -38,10 +38,12 @@ class SingletoneContainer extends SimpleContainer {
 		}
 		// delete this rule, because we need to access adding instance from outside
 		// don't delete this rule, because we don't need to do ServiceLocator
-		if (!this.classTreeList.find(clsTree => {
-			console.log(clsTree.baseNode.key, key);
-			return clsTree.baseNode.key.key === key.key
-		})) {
+		if (
+			!this.classTreeList.find((clsTree) => {
+				console.log(clsTree.baseNode.key, key);
+				return clsTree.baseNode.key.key === key.key;
+			})
+		) {
 			throw new Error(`ClassTree with key ${key.key} in '${this.getParent().name}/SingletoneContainer' not found.`);
 		}
 		this.#instances.set(key.key, instance);

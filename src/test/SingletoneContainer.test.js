@@ -3,7 +3,7 @@ import DependencyTreeFixture from "./fixtures/DependencyTreeFixture.js";
 import DependencyTree from "../containers/helpers/DependencyTree.js";
 import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SingletoneContainer from "../containers/SingletoneContainer.js";
-import ContextContainer from "../containers/ContextContainer.js";
+// import ContextContainer from "../containers/ContextContainer.js";
 import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 
@@ -11,15 +11,15 @@ describe("SingletoneContainer", () => {
 	describe("new SingletoneContainer()", () => {
 		it(
 			"should throw an error " +
-			"'Invalid simple container parent. " +
-			"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.'",
+				"'Invalid simple container parent. " +
+				"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.'",
 			() => {
 				const funcThrowsError = () => new SingletoneContainer();
 				assert.throws(
 					funcThrowsError,
 					Error,
 					"Invalid simple container parent. " +
-					"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.",
+						"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.",
 				);
 			},
 		);
@@ -32,7 +32,7 @@ describe("SingletoneContainer", () => {
 				funcThrowsError,
 				Error,
 				"DIContainer constructor's argument 'classTreeList' is invalid. " +
-				"Argument 'classTreeList' must be an array of DependencyTree instances",
+					"Argument 'classTreeList' must be an array of DependencyTree instances",
 			);
 			assert.deepEqual(funcThrowsError().classTreeList, []);
 		});
@@ -46,7 +46,7 @@ describe("SingletoneContainer", () => {
 				funcThrowsError,
 				Error,
 				"DIContainer constructor's argument 'classTreeList' is invalid. " +
-				"Argument 'classTreeList' must be an array of DependencyTree instances",
+					"Argument 'classTreeList' must be an array of DependencyTree instances",
 			);
 		});
 	});
@@ -54,15 +54,15 @@ describe("SingletoneContainer", () => {
 	describe("new SingletoneContainer(context, [{ test: 1 }, { test: 2 }])", () => {
 		it(
 			"should throw an error " +
-			"'DIContainer constructor's argument 'classTreeList' is invalid. " +
-			"Argument 'classTreeList' must be an array of DependencyTree instances'",
+				"'DIContainer constructor's argument 'classTreeList' is invalid. " +
+				"Argument 'classTreeList' must be an array of DependencyTree instances'",
 			() => {
 				const funcThrowsError = () => new SingletoneContainer(DependencyTreeFixture.context, [{ test: 1 }, { test: 2 }]);
 				assert.throws(
 					funcThrowsError,
 					Error,
 					"DIContainer constructor's argument 'classTreeList' is invalid. " +
-					"Argument 'classTreeList' must be an array of DependencyTree instances",
+						"Argument 'classTreeList' must be an array of DependencyTree instances",
 				);
 			},
 		);
@@ -102,7 +102,10 @@ describe("SingletoneContainer", () => {
 	describe("SingletoneContainer.addInstance('stringKey', instance)", () => {
 		const context = DependencyTreeFixture.context;
 		context.init();
-		const simpleContainer = new SingletoneContainer(context, context.classTreeList.filter(clsTree => clsTree.baseNode.lifecycle.id === LifecycleEnum.Singletone));
+		const simpleContainer = new SingletoneContainer(
+			context,
+			context.classTreeList.filter((clsTree) => clsTree.baseNode.lifecycle.id === LifecycleEnum.Singletone),
+		);
 
 		it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", () => {
 			const funcThrowsError = () => simpleContainer.addInstance("stringKey", new DependencyTreeFixture.derivedClazz.type());

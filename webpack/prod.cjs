@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 const webpack = require("webpack");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const base = require("./base.cjs");
@@ -6,26 +6,27 @@ const { merge } = require("webpack-merge");
 
 module.exports = merge(base, {
 	//...
-	entry: './src/index.js',
+	entry: "./src/index.js",
+	target: "node",
 	mode: "production",
 	devtool: "source-map",
 	output: {
 		filename: "dizy.js",
-		path: path.resolve(__dirname, '../dist'),
+		path: path.resolve(__dirname, "../lib"),
 		library: {
 			name: "dizy",
-			type: "umd"
+			type: "umd",
 		},
 	},
 	optimization: {
 		minimize: true,
 		minimizer: [
 			(compiler) => {
-				const TerserPlugin = require('terser-webpack-plugin');
+				const TerserPlugin = require("terser-webpack-plugin");
 				new TerserPlugin({
 					terserOptions: {
 						compress: {},
-					}
+					},
 				}).apply(compiler);
 			},
 		],
@@ -47,7 +48,5 @@ module.exports = merge(base, {
 		maxEntrypointSize: 512000,
 		maxAssetSize: 512000,
 	},
-	plugins: [
-		process.env.ANALYZE && new BundleAnalyzerPlugin(),
-	].filter((x) => x),
+	plugins: [process.env.ANALYZE && new BundleAnalyzerPlugin()].filter((x) => x),
 });
