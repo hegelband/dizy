@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          token: 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
+          token: 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
       - uses: actions/setup-node@v4
         with:
           node-version: 18.12.0
