@@ -3,7 +3,7 @@ import DependencyTreeFixture from "./fixtures/DependencyTreeFixture.js";
 import DependencyTree from "../containers/helpers/DependencyTree.js";
 import DependencyTreeNode from "../containers/helpers/DependencyTreeNode.js";
 import SessionContainer from "../containers/SessionContainer.js";
-import ContextContainer from "../containers/ContextContainer.js";
+// import ContextContainer from "../containers/ContextContainer.js";
 import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 
@@ -114,19 +114,22 @@ describe("SessionContainer", () => {
 		});
 	});
 
-	describe("SessionContainer.addInstance('stringKey', instance)", () => {
+	describe("SessionContainer._addInstance('stringKey', instance)", () => {
 		const context = DependencyTreeFixture.context;
 		context.init();
-		const sessionScope = new SessionContainer(context, context.classTreeList.filter(clsTree => clsTree.baseNode.lifecycle.id === LifecycleEnum.Session));
+		const sessionScope = new SessionContainer(
+			context,
+			context.classTreeList.filter((clsTree) => clsTree.baseNode.lifecycle.id === LifecycleEnum.Session),
+		);
 
 		it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", () => {
-			const funcThrowsError = () => sessionScope.addInstance("stringKey", new DependencyTreeFixture.sessionBClazz.type());
+			const funcThrowsError = () => sessionScope._addInstance("stringKey", new DependencyTreeFixture.sessionBClazz.type());
 			assert.throws(funcThrowsError, Error, `Invalid key type. Argument 'key' must be an instance of DIObjectKey class.`);
 		});
 
 		it("should add an instance (error not thrown)", () => {
 			const funcThrowsError = () =>
-				sessionScope.addInstance(DependencyTreeFixture.sessionBNode.key, new DependencyTreeFixture.sessionBClazz.type());
+				sessionScope._addInstance(DependencyTreeFixture.sessionBNode.key, new DependencyTreeFixture.sessionBClazz.type());
 			assert.doesNotThrow(funcThrowsError, Error);
 		});
 	});

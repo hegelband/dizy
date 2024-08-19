@@ -16,7 +16,16 @@ class InvalidAllClasses extends Error {
 	}
 }
 
+/** Class representing a factory for dependency trees
+ * @class
+ */
 class DependencyTreeFactory {
+	/** Returns new `DependencyTree` instance
+	 * @static
+	 * @param {DIClazz} baseClazz
+	 * @param {DIClazz[]} allClasses
+	 * @returns {DependencyTree}
+	 */
 	static createDependencyTree(baseClazz, allClasses) {
 		if (!(baseClazz instanceof DIClazz)) {
 			throw new InvalidBaseClazz();

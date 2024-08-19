@@ -7,7 +7,13 @@ class BaseNodeInvalid extends Error {
 	}
 }
 
+/** Class representing a dependency tree
+ * @class
+ */
 class DependencyTree {
+	/**
+	 * @param {DependencyTreeNode} baseNode
+	 */
 	constructor(baseNode) {
 		if (!(baseNode instanceof DependencyTreeNode)) {
 			throw new BaseNodeInvalid();
@@ -27,6 +33,11 @@ class DependencyTree {
 		return deps;
 	}
 
+	/** Returns all deps with specified height
+	 *
+	 * @param {number} height
+	 * @returns {DependencyTreeNode[]}
+	 */
 	getDepsByHeight(height) {
 		if (parseType(height) !== "number") {
 			throw new Error("getDepsByHeight arg 'height' is undefined. Argument 'height' value must be a positive number");
@@ -37,6 +48,16 @@ class DependencyTree {
 		return this.#getDepsByHeight(height);
 	}
 
+	/**
+	 * @typedef {Object} nodesGroupType
+	 * @property {number} height
+	 * @property {DependencyTreeNode[]} deps
+	 */
+
+	/** Returns nodes grouped by height
+	 *
+	 * @returns {nodesGroupType[]}
+	 */
 	groupByHeight() {
 		let currentHeight = 0;
 		const groups = [];

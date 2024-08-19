@@ -1,12 +1,13 @@
 {
 	"name": "dizy",
-	"version": "0.2.0",
-	"description": "Inversion of Control Container for JavaScript and Node.js",
-	"main": "./dist/dizy.js",
-	"module": "./dist/dizy-esm.js",
-	"browser": "./dist/dizy-esm.js",
-	"jsnext:main": "./dist/dizy-esm.js",
+	"version": "0.4.0",
+	"description": "A lightweight Vanilla JavaScript IoC container implementation.",
+	"main": "./lib/dizy.js",
+	"module": "./lib/dizy-esm.js",
+	"browser": "./lib/dizy-esm.js",
+	"jsnext:main": "./lib/dizy-esm.js",
 	"type": "module",
+	"types": "./types/src/index-esm.d.ts",
 	"scripts": {
 		"prepare": "husky",
 		"instrument": "nyc instrument ./src ./nyc-instrument-output",
@@ -26,9 +27,10 @@
 		"dizy",
 		"di",
 		"dijs",
-		"ioc",
 		"dependency injection",
-		"inversion of control"
+		"inversion of control",
+		"IoC",
+		"IoC container"
 	],
 	"repository": {
 		"type": "git",
@@ -38,6 +40,12 @@
 		"url": "https://github.com/kelian9/dizy/issues"
 	},
 	"license": "ISC",
+	"directories": {
+		"lib": "./lib"
+	},
+	"engines": {
+		"node": ">= 14.0.0"
+	},
 	"lint-staged": {
 		"src/**/*.{js}": [
 			"eslint --fix"

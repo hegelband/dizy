@@ -4,6 +4,12 @@ import Lifecycle from "./lifecycle/Lifecycle.js";
 import SessionLifecycle from "./lifecycle/SessionLifecycle.js";
 import SingletoneLifecycle from "./lifecycle/SingletoneLifecycle.js";
 
+/** @callback callbackType */
+
+/** Class representing an error thrown when `name` of DIObjectConfig is invalid.
+ * @class
+ * @extends Error
+ */
 export class InvalidDIObjectName extends Error {
 	constructor(name) {
 		const message = `DI object name { ${name} } is invalid. Name must be a not empty string`;
@@ -12,6 +18,10 @@ export class InvalidDIObjectName extends Error {
 	}
 }
 
+/** Class representing an error thrown when `parent` of DIObjectConfig is invalid.
+ * @class
+ * @extends Error
+ */
 export class InvalidDIObjectParent extends Error {
 	constructor() {
 		const message = "DI object parent must be an instance of AbstractContextContainer.";
@@ -20,6 +30,10 @@ export class InvalidDIObjectParent extends Error {
 	}
 }
 
+/** Class representing an error thrown when `lifecycle` of DIObjectConfig is unregistered.
+ * @class
+ * @extends Error
+ */
 export class UnregisteredDIObjectLifecycle extends Error {
 	constructor(lifecycle) {
 		const message = `There is no registered lifecycle with id = ${lifecycle.id}.`;
@@ -28,6 +42,10 @@ export class UnregisteredDIObjectLifecycle extends Error {
 	}
 }
 
+/** Class representing an error thrown when `lifecycle` of DIObjectConfig is invalid.
+ * @class
+ * @extends Error
+ */
 export class InvalidDIObjectLifecycle extends Error {
 	constructor(lifecycle) {
 		const message = `Invalid lifecycle { ${lifecycle} }. lifecycle prop must be an instance of Lifecycle or it's derived class.`;
@@ -36,6 +54,10 @@ export class InvalidDIObjectLifecycle extends Error {
 	}
 }
 
+/** Class representing an error thrown when `type` of DIObjectConfig is invalid.
+ * @class
+ * @extends Error
+ */
 export class InvalidDIObjectType extends Error {
 	constructor(type) {
 		const message = `DI object type { ${type} } is invalid. type prop must be a class or a function`;
@@ -44,7 +66,17 @@ export class InvalidDIObjectType extends Error {
 	}
 }
 
+/** Abstract Class representint di object config.
+ * @class
+ * @abstract
+ */
 export class DIObjectConfig {
+	/**
+	 * @constructor
+	 * @param {string|symbol} name
+	 * @param {callbackType} type
+	 * @param {Lifecycle} lifecycle
+	 */
 	constructor(name, type, lifecycle) {
 		if (!(typeof name === "string" || typeof name === "symbol") || !name === true) {
 			throw new InvalidDIObjectName(name);
@@ -61,20 +93,53 @@ export class DIObjectConfig {
 	}
 }
 
+/** Class representing a config of di object with demanded lifecycle
+ * @class
+ * @property {DemandedLifecycle} lifecycle
+ */
 export class DemandedConfig extends DIObjectConfig {
-	constructor(name = "", type = {}, beforeCreate = () => { }, afterCreate = () => { }) {
+	/**
+	 *
+	 * @param {string|symbol} name
+	 * @param {callbackType} type
+	 * @param {callbackType} [beforeCreate=()=>{}]
+	 * @param {callbackType} [afterCreate=()=>{}]
+	 */
+	constructor(name = "", type = {}, beforeCreate = () => {}, afterCreate = () => {}) {
 		super(name, type, new DemandedLifecycle(beforeCreate, afterCreate));
 	}
 }
 
+/** Class representing a config of di object with singletone lifecycle
+ * @class
+ * @property {SingletoneLifecycle} lifecycle
+ */
 export class SingletoneConfig extends DIObjectConfig {
-	constructor(name = "", type = {}, beforeCreate = () => { }, afterCreate = () => { }) {
+	/**
+	 *
+	 * @param {string|symbol} name
+	 * @param {callbackType} type
+	 * @param {callbackType} [beforeCreate=()=>{}]
+	 * @param {callbackType} [afterCreate=()=>{}]
+	 */
+	constructor(name = "", type = {}, beforeCreate = () => {}, afterCreate = () => {}) {
 		super(name, type, new SingletoneLifecycle(beforeCreate, afterCreate));
 	}
 }
 
+/** Class representing a config of di object with session lifecycle
+ * @class
+ * @property {SessionLifecycle} lifecycle
+ */
 export class SessionConfig extends DIObjectConfig {
-	constructor(name = "", type = {}, beforeCreate = () => { }, afterCreate = () => { }) {
+	/**
+	 *
+	 * @param {string|symbol} name
+	 * @param {callbackType} type
+	 * @param {callbackType} [beforeCreate=()=>{}]
+	 * @param {callbackType} [afterCreate=()=>{}]
+	 */
+	constructor(name = "", type = {}, beforeCreate = () => {}, afterCreate = () => {}) {
 		super(name, type, new SessionLifecycle(beforeCreate, afterCreate));
 	}
 }

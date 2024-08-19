@@ -19,6 +19,108 @@ import SingletoneLifecycleModule from "./lifecycle/SingletoneLifecycle.js";
 import ContextContainerFactoryModule from "./containers/ContextContainerFactory.js";
 import AbstractContextContainerFactoryModule from "./containers/AbstractContextContainerFactory.js";
 
+// const names = {
+//     windowName: Symbol.for('window'),
+//     sideBarName: Symbol.for('sideBar'),
+//     buttonName: 'button',
+//     rectangleName: 'rectangle',
+// };
+
+// const DIConfig = [
+//     // new DemandedConfig(
+//     //     'abstractWindow',
+//     //     AbstractWindow
+//     // ),
+//     new DemandedConfigModule(
+//         names.windowName,
+//         Window,
+//         function () {
+//             console.log(10);
+//         },
+//         function () {
+//             console.log(this.sideBar.button.width);
+//         }
+//     ),
+//     new SingletoneConfigModule(names.sideBarName, SideBar),
+//     new SessionConfigModule(names.buttonName, Button),
+// ];
+
+// const DISecondConfig = [
+//     new SessionConfigModule('dot', dot),
+//     new SessionConfigModule(names.rectangleName, rectangle),
+// ];
+
+// const appContext = new ContextContainerModule(DIConfig, 'app context');
+// const appSecondContext = new ContextContainerModule(DISecondConfig, 'app second context', appContext);
+
+// appContext.init();
+// appSecondContext.init();
+// appContext.getInstance(names.windowName);
+// console.log(appContext.getInstance(names.rectangleName));
+// console.log(appContext.getChildren());
+// const w = appContext.getInstance(Window);
+// console.log(appContext.typeMatch(names.windowName, Window));
+// const aw = appContext.getInstance(AbstractWindow);
+
+// const DIConfig = [
+//     new DIObjectConfig('animal', Animal, LifecycleEnum.Demanded),
+//     new DIObjectConfig('woman', Woman),
+//     new DIObjectConfig('man', Man),
+//     new DIObjectConfig('simple', Simple, LifecycleEnum.Singletone),
+//     new DIObjectConfig('dot', dot),
+//     new DIObjectConfig('line', line),
+//     new DIObjectConfig('square', square),
+//     new DIObjectConfig('rectangle', rectangle),
+// ];
+
+// const appContext = new ContextContainer(DIConfig, 'App Context');
+// appContext.init();
+
+// const simpleObj = appContext.getInstance(Simple);
+// const manObg = appContext.getInstance(Man);
+
+// appContext.getInstance(Simple);
+
+// console.log('This is Simple singletone from AppContext ', simpleObj);
+// console.log('This is Man session from AppContext ', manObg);
+
+// const testPromise = new Promise((resolve, reject) => {
+//     setTimeout(() => resolve(5), 1000);
+// });
+
+// testPromise.then((res) => {
+//     console.log(res);
+//     return res + 5;
+// });
+
+// testPromise.then((res) => {
+//     console.log(res);
+//     return res + 10;
+// })
+
+/** @module Dizy */
+
+/** Dizy type definition
+ * @typedef {Object} Dizy
+ * @property {ContextContainerModule} ContextContainer: ContextContainerModule,
+ * @property {AbstractContextContainerModule} AbstractContextContainer: AbstractContextContainerModule,
+ * @property {DemandedFactoryModule} DemandedFactory: DemandedFactoryModule,
+ * @property {SimpleContainerModule} SimpleContainer: SimpleContainerModule,
+ * @property {SessionContainerModule} SessionContainer: SessionContainerModule,
+ * @property {SingletoneContainerModule} SingletoneContainer: SingletoneContainerModule,
+ * @property {DIObjectKeyModule} DIObjectKey: DIObjectKeyModule,
+ * @property {DemandedConfigModule} DemandedConfig: DemandedConfigModule,
+ * @property {SessionConfigModule} SessionConfig: SessionConfigModule,
+ * @property {SingletoneConfigModule} SingletoneConfig: SingletoneConfigModule,
+ * @property {DIObjectConfigModule} DIObjectConfig: DIObjectConfigModule,
+ * @property {DIClazzModule} DIClazz: DIClazzModule,
+ * @property {DemandedLifecycleModule} DemandedLifecycle: DemandedLifecycleModule,
+ * @property {SingletoneLifecycleModule} SingletoneLifecycle: SingletoneLifecycleModule,
+ * @property {SessionLifecycleModule} SessionLifecycle: SessionLifecycleModule,
+ * @property {LifecycleModule} Lifecycle: LifecycleModule,
+ * @property {ContextContainerFactoryModule} ContextContainerFactory: ContextContainerFactoryModule,
+ * @property {AbstractContextContainerFactoryModule} AbstractContextContainerFactory: AbstractContextContainerFactoryModule,
+ */
 const Dizy = {
 	ContextContainer: ContextContainerModule,
 	AbstractContextContainer: AbstractContextContainerModule,

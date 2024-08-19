@@ -1,8 +1,12 @@
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
+// eslint-disable-next-line no-unused-vars
+import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 // import deepEqual from "../utils/deepEqual.js";
 import AbstractContextContainer from "./AbstractContextContainer.js";
 import DependencyTree from "./helpers/DependencyTree.js";
+// eslint-disable-next-line no-unused-vars
+import DIObjectKey from "./helpers/DIObjectKey.js";
 import InstanceHelper from "./helpers/InstanceHelper.js";
 
 class InvalidDemandedFactoryParent extends Error {
@@ -23,7 +27,15 @@ class DemandedFactoryClassTreeListInvalid extends Error {
 	}
 }
 
+/** Class representing a DI objects factory for objects with demanded lifecycle
+ * @class
+ */
 class DemandedFactory {
+	/**
+	 *
+	 * @param {AbstractContextContainer} parent - parent container
+	 * @param {DependencyTree[]} [classTreeList=[]] - list of di objects dependency tree
+	 */
 	constructor(parent, classTreeList = []) {
 		if (!(parent instanceof AbstractContextContainer)) {
 			throw new InvalidDemandedFactoryParent();
@@ -62,6 +74,10 @@ class DemandedFactory {
 		return instance;
 	}
 
+	/** Adds new di object
+	 * @public
+	 * @param {DependencyTree} diObjectClazzTree
+	 */
 	addDIObject(diObjectClazzTree) {
 		if (diObjectClazzTree.baseNode.lifecycle.id !== LifecycleEnum.Demanded) {
 			throw new ContainerHasClassWithInvalidLifecycle("Demanded", diObjectClazzTree);
@@ -69,6 +85,11 @@ class DemandedFactory {
 		this.classTreeList.push(diObjectClazzTree);
 	}
 
+	/** Creates new instance of di object
+	 *
+	 * @param {DIObjectKey} key
+	 * @returns {Object|FunctionWrapper}
+	 */
 	createInstance(key) {
 		// create new instance and add it in Map
 		// const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
@@ -79,6 +100,10 @@ class DemandedFactory {
 		return this.#buildInstance(clazz);
 	}
 
+	/** Returns context that's a parent container of this SessionContainer
+	 *
+	 * @returns {ContextContainer}
+	 */
 	getParent() {
 		return this.#parent;
 	}

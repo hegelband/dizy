@@ -3,7 +3,7 @@ import { assert } from "chai";
 import InstanceHelper from "../containers/helpers/InstanceHelper.js";
 import DIObjectKeyFactory from "../containers/helpers/DIObjectKeyFactory.js";
 import SingletoneLifecycle from "../lifecycle/SingletoneLifecycle.js";
-import ContextContainer from "../containers/ContextContainer.js";
+// import ContextContainer from "../containers/ContextContainer.js";
 import DIClazz from "../DIClazz.js";
 import ContextContainerFactory from "../containers/ContextContainerFactory.js";
 

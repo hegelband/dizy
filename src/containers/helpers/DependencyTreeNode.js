@@ -1,7 +1,19 @@
 import { parseType } from "../../../ReflectionJs/index.js";
 import DIClazz from "../../DIClazz.js";
 
+/** Class representing a node of dependency tree
+ * @class
+ * @extends DIClazz
+ * @property {number} height
+ * @property {DependencyTreeNode[]} deps
+ */
 class DependencyTreeNode extends DIClazz {
+	/**
+	 *
+	 * @param {DIClazz} baseClazz
+	 * @param {number} height
+	 * @param {DependencyTreeNode[]} deps
+	 */
 	constructor(baseClazz, height, deps) {
 		if (!(baseClazz instanceof DIClazz)) {
 			throw new Error("DependencyTreeNode 'baseClazz' is invalid. Constructor argument 'baseClazz' must be a DIClazz instance.");
