@@ -1,6 +1,6 @@
 {
 	"name": "dizy",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"description": "A lightweight Vanilla JavaScript IoC container implementation.",
 	"main": "./lib/dizy.js",
 	"module": "./lib/dizy-esm.js",
@@ -57,6 +57,11 @@
 			"commit-msg": "npx run commitlint --edit $1"
 		}
 	},
+	"files": [
+		"ReflectionJs/**/*",
+		"lib/**/*",
+		"types/**/*"
+	],
 	"devDependencies": {
 		"@babel/core": "^7.24.5",
 		"@babel/preset-env": "^7.24.5",
