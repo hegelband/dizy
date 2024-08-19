@@ -22,7 +22,7 @@
 		"prettier-write": "prettier --write src/**/*.{js,cjs,mjs}",
 		"build": "webpack --config webpack/prod.cjs && webpack --config webpack/prod-esm.cjs"
 	},
-	"author": "",
+	"author": "hegelband",
 	"keywords": [
 		"dizy",
 		"di",
