@@ -69,7 +69,6 @@ class DIObjectKeyFactory {
 	}
 
 	#stringifyKeyDescription({ parent, name, lifecycle, isClass }) {
-		console.log(parent);
 		return `@${parent?.name}/${name}/${lifecycle.id}/${isClass}`;
 	}
 

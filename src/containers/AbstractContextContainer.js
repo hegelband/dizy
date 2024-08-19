@@ -9,6 +9,7 @@ import {
 import DIClazz from "../DIClazz.js";
 import { DIObjectConfig } from "../DIObjectConfig.js";
 import DependencyLoopError from "../errors/DependencyLoopError.js";
+import InvalidAbstractContextConfig from "../errors/InvalidAbstractContextConfig.js";
 import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
 import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
@@ -430,7 +431,6 @@ class AbstractContextContainer extends AbstractDIContainer {
 		if (parseType(clazz) !== "class") return true;
 		const baseClass = getBaseClass(clazz);
 		const isAnotherDIObject = this.config.findIndex((objConfig) => objConfig.type.name === baseClass.name) !== -1;
-		// console.log(clazz.name, baseClass.name, isAnotherDIObject);
 		if (baseClass.name !== "Object") {
 			if (isAnotherDIObject) {
 				const clsConstructorArgs = getClassConstructorArgsNames(clazz).args;
