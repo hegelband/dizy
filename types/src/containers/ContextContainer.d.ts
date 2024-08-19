@@ -5,7 +5,14 @@ export default ContextContainer;
  * @extends AbstractContextContainer
  */
 declare class ContextContainer extends AbstractContextContainer {
-    constructor(config?: any[], name?: string, parent?: any, keyFactory?: DIObjectKeyFactory);
+    /**
+     *
+     * @param {DIObjectConfig[]} [config=[]]
+     * @param {string} [name=""]
+     * @param {ContextContainer} [parent=null]
+     * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()]
+     */
+    constructor(config?: DIObjectConfig[], name?: string, parent?: ContextContainer, keyFactory?: DIObjectKeyFactory);
     /** Add DI Object to this context
      * @public
      * @param {SingletoneConfig|SessionConfig|DemandedConfig} diObjectConfig - config of new di object
@@ -53,4 +60,5 @@ import { DemandedConfig } from "../DIObjectConfig.js";
 import SingletoneContainer from "./SingletoneContainer.js";
 import SessionContainer from "./SessionContainer.js";
 import DemandedFactory from "./DemandedFactory.js";
+import { DIObjectConfig } from "../DIObjectConfig.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
