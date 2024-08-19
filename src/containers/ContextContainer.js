@@ -5,7 +5,7 @@ import SingletoneContainer from "./SingletoneContainer.js";
 import DemandedFactory from "./DemandedFactory.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 // eslint-disable-next-line no-unused-vars
-import { DemandedConfig, SessionConfig, SingletoneConfig } from "../DIObjectConfig.js";
+import { DemandedConfig, DIObjectConfig, SessionConfig, SingletoneConfig } from "../DIObjectConfig.js";
 
 /** Class for context - ContextContainer.
  * It takes config and generates dependency trees, validates it, creates scopes and allow to get instances
@@ -13,6 +13,13 @@ import { DemandedConfig, SessionConfig, SingletoneConfig } from "../DIObjectConf
  * @extends AbstractContextContainer
  */
 class ContextContainer extends AbstractContextContainer {
+	/**
+	 *
+	 * @param {DIObjectConfig[]} [config=[]]
+	 * @param {string} [name=""]
+	 * @param {ContextContainer} [parent=null]
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()]
+	 */
 	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
 		super(config, name, parent, keyFactory);
 		// this.#parent = parent;
