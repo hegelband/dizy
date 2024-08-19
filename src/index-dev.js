@@ -1,8 +1,4 @@
-import {
-	DemandedConfig as DemandedConfigModule,
-	SessionConfig as SessionConfigModule,
-	SingletoneConfig as SingletoneConfigModule,
-} from "./DIObjectConfig.js";
+import { DemandedConfig, SessionConfig, SingletoneConfig } from "./DIObjectConfig.js";
 import Window from "./modules/Window.js";
 import Button from "./modules/Button.js";
 import SideBar from "./modules/SideBar.js";
@@ -24,7 +20,7 @@ const names = {
 };
 
 const DIConfig = [
-	new DemandedConfigModule(
+	new DemandedConfig(
 		names.windowName,
 		Window,
 		() => {
@@ -34,16 +30,16 @@ const DIConfig = [
 			console.log(this.sideBar.button.width);
 		},
 	),
-	new SingletoneConfigModule(names.sideBarName, SideBar),
-	new SessionConfigModule(names.buttonName, Button),
+	new SingletoneConfig(names.sideBarName, SideBar),
+	new SessionConfig(names.buttonName, Button),
 ];
 
-const DISecondConfig = [new SessionConfigModule("dot", dot), new SessionConfigModule(names.rectangleName, rectangle)];
+const DISecondConfig = [new SessionConfig("dot", dot), new SessionConfig(names.rectangleName, rectangle)];
 
 const appContext = ContextContainerFactory.createContainer(DIConfig, "app context");
 const appSecondContext = ContextContainerFactory.createContainer(DISecondConfig, "app second context", appContext);
 
-const userFormDIObjectConfig = new SingletoneConfigModule("userForm", UserForm);
+const userFormDIObjectConfig = new SingletoneConfig("userForm", UserForm);
 
 appContext.init();
 appSecondContext.init();

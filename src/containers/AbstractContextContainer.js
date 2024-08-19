@@ -14,7 +14,11 @@ import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.j
 import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
 import AbstractDIContainer from "./AbstractDIContainer.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
+// eslint-disable-next-line no-unused-vars
+import DependencyTree from "./helpers/DependencyTree.js";
 import DependencyTreeFactory from "./helpers/DependencyTreeFactory.js";
+// eslint-disable-next-line no-unused-vars
+import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 
 // class DIObjectHasInvalidName extends Error {
 // 	constructor(name, contextName) {
@@ -59,16 +63,22 @@ class InvalidContextChild extends Error {
 	}
 }
 
-/** Abstract Class for context - AbstractContextContainer.
- * It takes config and generates dependency trees, validate it, create
+/** Abstract Class for context - AbstractContextContainer. It takes config and generates dependency trees, validate it, create
  * @class
  * @abstract
  * @extends AbstractDIContainer
  *
  * @property {DependencyTree[]} classTreeList - list of di objects dependency tree.
  * @property {Map} scopes - Map of Simple DI Containers, like SingletoneContainer, SessionContainer, DemandedFactory.
- * @property
- *
+//  *
+//  * @property {boolean} contextReady - Is context ready for work?
+//  * @private
+//  *
+//  * @property {DIClazz[]} clazzes - List of DIObjectClazz.
+//  * @private
+//  *
+//  * @property {Map<AbstractContextContainer>} - Map of AbstractContextContainer.
+//  * @private
  */
 class AbstractContextContainer extends AbstractDIContainer {
 	/**
@@ -84,25 +94,11 @@ class AbstractContextContainer extends AbstractDIContainer {
 		this.#keyFactory = keyFactory;
 	}
 
-	/** Is context ready for work?
-	 * @type {boolean}
-	 * @private
-	 */
 	#contextReady = false;
 
 	#parent;
 	#keyFactory;
-
-	/** List of DIObjectClazz.
-	 * @type {DIClazz[]}
-	 * @private
-	 */
 	#clazzes = [];
-
-	/** Map of AbstractContextContainer.
-	 * @type {Map<AbstractContextContainer>}
-	 * @private
-	 */
 	#children = new Map();
 
 	classTreeList = [];
@@ -182,6 +178,13 @@ class AbstractContextContainer extends AbstractDIContainer {
 		// ToDo Правила жизненных циклов
 	}
 
+	/** Add new di object to existed context
+	 * @param {DIObjectConfig} diObjectConfig - config of new di object
+	 * @example <caption>Usage of addDIObject.</caption>
+	 * // returns tree
+	 * context.addDIObject(SingletoneConfig(...));
+	 * @returns {DependencyTree}
+	 */
 	addDIObject(diObjectConfig) {
 		if (!(diObjectConfig instanceof DIObjectConfig)) {
 			throw new InvalidAbstractContextConfig();
@@ -194,20 +197,46 @@ class AbstractContextContainer extends AbstractDIContainer {
 		return tree;
 	}
 
+	/** Init classTreeList prop with DependencyTreeFactory
+	 * @private
+	 */
 	#initClassTreeList() {
 		this.classTreeList = this.#clazzes.map((clazz) => DependencyTreeFactory.createDependencyTree(clazz, this.#clazzes));
 	}
 
+	/** Create and add scopes to AbstractContextContainer.#scopes
+	 * @protected
+	 */
 	_createScopes() {}
 
+	/**
+	 * @protected
+	 */
 	_initScopes() {}
 
+	/** Returns `true` if context has an instance of di object with specified name.
+	 * @public
+	 * @param {string} name - name of di object from this context
+	 * @returns {boolean}
+	 */
 	// eslint-disable-next-line no-unused-vars
 	hasInstance(name) {}
 
+	/** Get an instance of di object with specified name and lifecycleId.
+	 * @public
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @param {number} [lifecycleId] - id of Lifecycle
+	 * @returns {Object|FunctionWrapper|undefined}
+	 */
 	// eslint-disable-next-line no-unused-vars
 	getInstance(name, lifecycleId) {}
 
+	/** Find dependency tree by name and lifecycle id of di object.
+	 * @protected
+	 * @param {string|symbol|Function} name - name of di object
+	 * @param {number} [lifecycleId] - di object lifecycle id
+	 * @returns {DependencyTree|undefined}
+	 */
 	_findClassTree(name, lifecycleId) {
 		let findCallback;
 		switch (typeof name) {
@@ -235,15 +264,29 @@ class AbstractContextContainer extends AbstractDIContainer {
 		return clazz;
 	}
 
+	/** Returns `true` if type of di object with specified key is the same as 'type' argument.
+	 * @abstract
+	 * @param {string|symbol} key - 'key' of di object
+	 * @param {any} type - type of di object
+	 * @returns {boolean}
+	 */
 	// eslint-disable-next-line no-unused-vars
 	typeMatch(key, type) {
 		// is DI object with key instance of type
 	}
 
+	/** Get parent DIContainer.
+	 * @public
+	 * @returns {AbstractContextContainer|null}
+	 */
 	getParent() {
 		return this.#parent;
 	}
 
+	/** Set parent of this context and add this context as a child to parent.
+	 * @public
+	 * @param {AbstractContextContainer} parent
+	 */
 	setParent(parent) {
 		if (parent instanceof AbstractContextContainer) {
 			if (parent.getChildren().has(this.name)) {
@@ -254,10 +297,19 @@ class AbstractContextContainer extends AbstractDIContainer {
 		}
 	}
 
+	/** Removes reference to parent.
+	 * @protected
+	 */
 	_removeParent() {
 		this.#parent = null;
 	}
 
+	/** Get di object instance from child context.
+	 * @protected
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @param {number} [lifecycleId] - id of Lifecycle
+	 * @returns {Object|FunctionWrapper|undefined}
+	 */
 	_getChildInstance(name, lifecycleId) {
 		let instance;
 		const childContext = [...this.#children.values()].find((context) => {
@@ -267,10 +319,18 @@ class AbstractContextContainer extends AbstractDIContainer {
 		return childContext ? instance : undefined;
 	}
 
+	/** Get children of context.
+	 * @public
+	 * @returns {Map<string, AbstractContextContainer>}
+	 */
 	getChildren() {
 		return this.#children;
 	}
 
+	/** Add child context.
+	 * @public
+	 * @param {AbstractContextContainer} childContext
+	 */
 	addChild(childContext) {
 		if (!(childContext instanceof AbstractContextContainer)) {
 			throw new InvalidContextChild();
@@ -278,6 +338,10 @@ class AbstractContextContainer extends AbstractDIContainer {
 		this.#children.set(childContext.name, childContext);
 	}
 
+	/** Removes child context by it's name.
+	 * @public
+	 * @param {string} childName - name of child context
+	 */
 	deleteChild(childName) {
 		if (!this.#children.has(childName)) {
 			return;
@@ -286,9 +350,17 @@ class AbstractContextContainer extends AbstractDIContainer {
 		this.#children.delete(childName);
 	}
 
+	/** Get scope by lifecycle id.
+	 * @abstract
+	 */
 	// eslint-disable-next-line no-unused-vars
 	getScope(lifecycleId) {}
 
+	/** Filter dependency tree list by lifecycle id.
+	 * @public
+	 * @param {number} lifecycleId
+	 * @returns {DependencyTree[]}
+	 */
 	filterClassesByLifecycle(lifecycleId) {
 		return this.classTreeList.filter((cls) => cls.baseNode.lifecycle.id === lifecycleId);
 	}

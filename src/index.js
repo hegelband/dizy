@@ -98,6 +98,29 @@ import AbstractContextContainerFactoryModule from "./containers/AbstractContextC
 //     return res + 10;
 // })
 
+/** @module Dizy */
+
+/** Dizy type definition
+ * @typedef {Object} Dizy
+ * @property {ContextContainerModule} ContextContainer: ContextContainerModule,
+ * @property {AbstractContextContainerModule} AbstractContextContainer: AbstractContextContainerModule,
+ * @property {DemandedFactoryModule} DemandedFactory: DemandedFactoryModule,
+ * @property {SimpleContainerModule} SimpleContainer: SimpleContainerModule,
+ * @property {SessionContainerModule} SessionContainer: SessionContainerModule,
+ * @property {SingletoneContainerModule} SingletoneContainer: SingletoneContainerModule,
+ * @property {DIObjectKeyModule} DIObjectKey: DIObjectKeyModule,
+ * @property {DemandedConfigModule} DemandedConfig: DemandedConfigModule,
+ * @property {SessionConfigModule} SessionConfig: SessionConfigModule,
+ * @property {SingletoneConfigModule} SingletoneConfig: SingletoneConfigModule,
+ * @property {DIObjectConfigModule} DIObjectConfig: DIObjectConfigModule,
+ * @property {DIClazzModule} DIClazz: DIClazzModule,
+ * @property {DemandedLifecycleModule} DemandedLifecycle: DemandedLifecycleModule,
+ * @property {SingletoneLifecycleModule} SingletoneLifecycle: SingletoneLifecycleModule,
+ * @property {SessionLifecycleModule} SessionLifecycle: SessionLifecycleModule,
+ * @property {LifecycleModule} Lifecycle: LifecycleModule,
+ * @property {ContextContainerFactoryModule} ContextContainerFactory: ContextContainerFactoryModule,
+ * @property {AbstractContextContainerFactoryModule} AbstractContextContainerFactory: AbstractContextContainerFactoryModule,
+ */
 const Dizy = {
 	ContextContainer: ContextContainerModule,
 	AbstractContextContainer: AbstractContextContainerModule,

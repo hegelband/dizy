@@ -114,7 +114,7 @@ describe("SessionContainer", () => {
 		});
 	});
 
-	describe("SessionContainer.addInstance('stringKey', instance)", () => {
+	describe("SessionContainer._addInstance('stringKey', instance)", () => {
 		const context = DependencyTreeFixture.context;
 		context.init();
 		const sessionScope = new SessionContainer(
@@ -123,13 +123,13 @@ describe("SessionContainer", () => {
 		);
 
 		it("should throw an error 'Invalid key type. Argument 'key' must be an instance of DIObjectKey class.'", () => {
-			const funcThrowsError = () => sessionScope.addInstance("stringKey", new DependencyTreeFixture.sessionBClazz.type());
+			const funcThrowsError = () => sessionScope._addInstance("stringKey", new DependencyTreeFixture.sessionBClazz.type());
 			assert.throws(funcThrowsError, Error, `Invalid key type. Argument 'key' must be an instance of DIObjectKey class.`);
 		});
 
 		it("should add an instance (error not thrown)", () => {
 			const funcThrowsError = () =>
-				sessionScope.addInstance(DependencyTreeFixture.sessionBNode.key, new DependencyTreeFixture.sessionBClazz.type());
+				sessionScope._addInstance(DependencyTreeFixture.sessionBNode.key, new DependencyTreeFixture.sessionBClazz.type());
 			assert.doesNotThrow(funcThrowsError, Error);
 		});
 	});

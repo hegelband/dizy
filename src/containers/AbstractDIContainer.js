@@ -27,6 +27,7 @@ class DIContainerClassTreeListInvalid extends Error {
 /** Abstract Class AbstractDIContainer
  * @abstract
  * @extends {DIContainer}
+ * @property {DependencyTree[]} classTreeList
  */
 class AbstractDIContainer extends DIContainer {
 	/**

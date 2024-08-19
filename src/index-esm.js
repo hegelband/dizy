@@ -19,6 +19,8 @@ import SingletoneLifecycleModule from "./lifecycle/SingletoneLifecycle.js";
 import ContextContainerFactoryModule from "./containers/ContextContainerFactory.js";
 import AbstractContextContainerFactoryModule from "./containers/AbstractContextContainerFactory.js";
 
+/** @module Dizy */
+
 const Dizy = {
 	ContextContainer: ContextContainerModule,
 	AbstractContextContainer: AbstractContextContainerModule,
