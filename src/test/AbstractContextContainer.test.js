@@ -1,6 +1,7 @@
 import { assert } from "chai";
 // eslint-disable-next-line no-unused-vars
 import ContextContainer from "../containers/ContextContainer.js"; // without this import mocha throws an error
+// eslint-disable-next-line no-unused-vars
 import AbstractContextContainer from "../containers/AbstractContextContainer.js";
 import { SingletoneConfig } from "../DIObjectConfig.js";
 import DependencyTree from "../containers/helpers/DependencyTree.js";

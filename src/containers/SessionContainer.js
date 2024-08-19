@@ -80,11 +80,13 @@ class SessionContainer extends SimpleContainer {
 			throw new Error(`Invalid key type. Argument 'key' must be an instance of DIObjectKey class.`);
 		}
 		// delete this rule, because we need to access adding instance from outside
-		if (!this.classTreeList.find(clsTree => {
-			console.log(clsTree.baseNode.key, key);
-			return clsTree.baseNode.key.key === key.key
-		})) {
-		    throw new Error(`ClassTree with key ${key.key} in '${this.getParent().name}/SessionContainer' not found.`);
+		if (
+			!this.classTreeList.find((clsTree) => {
+				console.log(clsTree.baseNode.key, key);
+				return clsTree.baseNode.key.key === key.key;
+			})
+		) {
+			throw new Error(`ClassTree with key ${key.key} in '${this.getParent().name}/SessionContainer' not found.`);
 		}
 		this.#instances.set(key.key, instance);
 	}
