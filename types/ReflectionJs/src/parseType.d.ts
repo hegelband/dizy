@@ -1,2 +1,14 @@
 export = parseType;
-declare function parseType(data: any): "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "class" | "null" | "function class";
+/**
+ * @typedef {'function'|'class'|'function class'|'string'|'number'|'boolean'|'symbol'|'object'|'undefined'} ParseTypeReturnType
+ */
+/**
+ *
+ * @param {any} data
+ * @returns {ParseTypeReturnType}
+ */
+declare function parseType(data: any): ParseTypeReturnType;
+declare namespace parseType {
+    export { ParseTypeReturnType };
+}
+type ParseTypeReturnType = "function" | "class" | "function class" | "string" | "number" | "boolean" | "symbol" | "object" | "undefined";

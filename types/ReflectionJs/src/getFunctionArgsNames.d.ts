@@ -1,10 +1,35 @@
 export = getFunctionArgsNames;
-declare function getFunctionArgsNames(func: any): {
-    startPosition: any;
-    args: any[];
-};
+/**
+ * @typedef { Object } ParsedArgumentsType
+ * @property { number } startPosition
+ * @property { string[] } args - constructor stringified args commas separated
+ */
+/**
+ *
+ * @param {function} func
+ * @returns {ParsedArgumentsType}
+ */
+declare function getFunctionArgsNames(func: Function): ParsedArgumentsType;
 declare namespace getFunctionArgsNames {
-    export { findCloseBraceIndex, splitArgsStrByCommas };
+    export { findCloseBraceIndex, splitArgsStrByCommas, ParsedArgumentsType };
 }
-declare function findCloseBraceIndex(str: any, startIndex: any): any;
-declare function splitArgsStrByCommas(argsStr: any): any[];
+/** Returns closing brace index
+ *
+ * @param {string} str
+ * @param {number} startIndex
+ * @returns {number}
+ */
+declare function findCloseBraceIndex(str: string, startIndex: number): number;
+/**	Returns arguments stringified by toString
+ *
+ * @param {string} argsStr
+ * @returns {string[]}
+ */
+declare function splitArgsStrByCommas(argsStr: string): string[];
+type ParsedArgumentsType = {
+    startPosition: number;
+    /**
+     * - constructor stringified args commas separated
+     */
+    args: string[];
+};
