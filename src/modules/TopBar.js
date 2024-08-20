@@ -1,0 +1,3 @@
+class TopBar {
+	constructor() {}
+}
