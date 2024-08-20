@@ -18,6 +18,9 @@
 		"clean-repo-from-dev": "rimraf app.cjs index.html node.mjs vite.config.js src/index-dev.js src/modules",
 		"lint": "eslint --ext .js src --fix",
 		"start": "webpack serve --mode development --config webpack/dev.cjs",
+		"prettier-check": "prettier --check src/**/*.{js,cjs,mjs}",
+		"prettier-write": "prettier --write src/**/*.{js,cjs,mjs}",
+		"generate-declarations": "tsc --allowJs --d --emitDeclarationOnly --outDir types",
 		"build": "webpack --config webpack/prod.cjs && webpack --config webpack/prod-esm.cjs"
 	},
 	"author": "",
