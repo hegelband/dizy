@@ -5,6 +5,11 @@ import InvalidContextContainerNameType from "../errors/InvalidContextContainerNa
 import NotUniqueContextContainerName from "../errors/NotUniqueContextContainerName.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 
+/** Class for creation of ContextContainer - ContextContainerFactory.
+ *
+ * @class
+ * @extends AbstractContextContainerFactory
+ */
 class ContextContainerFactory extends AbstractContextContainerFactory {
 	static #names = new Set();
 	static #addName(name) {
@@ -17,10 +22,17 @@ class ContextContainerFactory extends AbstractContextContainerFactory {
 		ContextContainerFactory.#names.add(name);
 	}
 
+	/** Returns new AbstractContextContainer.
+	 * @static
+	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
+	 * @param {string} [name=""] - name of context
+	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
+	 * @returns {ContextContainer}
+	 */
 	static createContainer(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
 		if (name === "") {
 			name = generateRandomString(7);
-			console.log(name);
 		}
 		if (super.validateContainerParams(config, name, parent, keyFactory)) {
 			const context = new ContextContainer(config, name, parent, keyFactory);

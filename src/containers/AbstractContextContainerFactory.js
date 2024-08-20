@@ -5,7 +5,18 @@ import InvalidAbstractContextConfig from "../errors/InvalidAbstractContextConfig
 import InvalidAbstractContextParent from "../errors/InvalidAbstractContextParent.js";
 import InvalidDIObjectKeyFactory from "../errors/InvalidDIObjectKeyFactory.js";
 
+/** Abstract Class for creation of AbstractContextContainer - AbstractContextContainerFactory.
+ *
+ * @class
+ */
 class AbstractContextContainerFactory {
+	/** Returns new AbstractContextContainer.
+	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
+	 * @param {string} [name=""] - name of context
+	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
+	 * @returns {AbstractContextContainer}
+	 */
 	createContainer(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
 		if (AbstractContextContainerFactory.validateContainerParams(config, name, parent, keyFactory)) {
 			const context = new AbstractContextContainer(config, name, parent, keyFactory);
@@ -14,6 +25,14 @@ class AbstractContextContainerFactory {
 		}
 	}
 
+	/** Validates container params
+	 * @static
+	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
+	 * @param {string} [name=""] - name of context
+	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
+	 * @returns {boolean}
+	 */
 	static validateContainerParams(config, name, parent, keyFactory) {
 		if (!Array.isArray(config) || config.find((c) => !(c instanceof DIObjectConfig))) {
 			throw new InvalidAbstractContextConfig();
