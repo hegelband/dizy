@@ -12,6 +12,10 @@ import AbstractContextContainer from "../AbstractContextContainer.js";
 import DIObjectKey from "./DIObjectKey.js";
 import LifecycleEnum from "../../constants/LifecycleEnum.js";
 
+/** Class represents an error thrown when di object's key isn't unique
+ * @class
+ * @extends Error
+ */
 class NotUniqueDIObjectKey extends Error {
 	constructor({ parent, name, lifecycle, isClass }) {
 		const message = `DI key with description {
@@ -25,13 +29,28 @@ class NotUniqueDIObjectKey extends Error {
 	}
 }
 
+/** Class representing factory for di object keys
+ * @class
+ */
 class DIObjectKeyFactory {
+	/**
+	 *
+	 * @param {Map} [keys=new Map()]
+	 */
 	constructor(keys = new Map()) {
 		this.#keys = keys;
 	}
 
 	#keys;
 
+	/** Returns new key string
+	 *
+	 * @param {AbstractContextContainer} parent
+	 * @param {string} name
+	 * @param {Lifecycle} lifecycle
+	 * @param {boolean} isClass
+	 * @returns {string}
+	 */
 	createKey(parent, name, lifecycle, isClass) {
 		this.#validateKeyParams(parent, name, lifecycle, isClass);
 		const keyDescription = {
@@ -50,7 +69,6 @@ class DIObjectKeyFactory {
 	}
 
 	#stringifyKeyDescription({ parent, name, lifecycle, isClass }) {
-		console.log(parent);
 		return `@${parent?.name}/${name}/${lifecycle.id}/${isClass}`;
 	}
 

@@ -72,7 +72,6 @@ describe("DemandedFactory", () => {
 		describe("DemandedFactory.createInstance(key of di object from this container)", () => {
 			it(`should return an instance of class A`, () => {
 				// const b = new DependencyTreeFixture.demBClazz.type();
-				// console.log(b);
 				// assert.deepEqual(instance, new DependencyTreeFixture.demAClazz.type(b));
 			});
 		});
