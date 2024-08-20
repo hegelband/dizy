@@ -36,10 +36,10 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/kelian9/dizy.git"
+		"url": "https://github.com/hegelband/dizy.git"
 	},
 	"bugs": {
-		"url": "https://github.com/kelian9/dizy/issues"
+		"url": "https://github.com/hegelband/dizy/issues"
 	},
 	"license": "ISC",
 	"directories": {
