@@ -6,3 +6,8 @@
 		<img src="https://codecov.io/gh/kelian9/dizy/graph/badge.svg?token=0ASEASXF1Q"/>
 	</a>
 </p>
+
+## Supporters
+
+[**Become a sponsor on patreon**](https://www.patreon.com/Hegelband)
+[**Become a sponsor on opencollective**](https://opencollective.com/hegelband/projects/dizy-js) to get your company in front of future thousands of engaged developers and help us out!
