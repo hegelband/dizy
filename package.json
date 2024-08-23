@@ -41,7 +41,7 @@
 	"bugs": {
 		"url": "https://github.com/hegelband/dizy/issues"
 	},
-	"license": "ISC",
+	"license": "MIT",
 	"directories": {
 		"lib": "./lib"
 	},
