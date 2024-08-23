@@ -9,5 +9,6 @@
 
 ## Supporters
 
-[**Become a sponsor on patreon**](https://www.patreon.com/Hegelband)
+[**Become a sponsor on patreon**](https://www.patreon.com/Hegelband)  
+
 [**Become a sponsor on opencollective**](https://opencollective.com/hegelband/projects/dizy-js) to get your company in front of future thousands of engaged developers and help us out!
