@@ -1,6 +1,6 @@
 {
 	"name": "dizy",
-	"version": "0.4.4",
+	"version": "0.4.5",
 	"description": "A lightweight Vanilla JavaScript IoC container implementation.",
 	"main": "./lib/dizy.js",
 	"module": "./lib/dizy-esm.js",
@@ -60,8 +60,13 @@
 		}
 	},
 	"files": [
-		"ReflectionJs/**/*",
-		"lib/**/*",
+		"ReflectionJs/src/**/*",
+		"ReflectionJs/index.js",
+		"ReflectionJs/index-esm.js",
+		"ReflectionJs/package.json",
+		"ReflectionJs/types/**/*",
+		"lib/dizy-esm.js",
+		"lib/dizy.js",
 		"types/**/*"
 	],
 	"devDependencies": {
