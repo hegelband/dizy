@@ -1,7 +1,7 @@
 {
 	"name": "dizy",
 	"version": "0.4.5",
-	"description": "A lightweight Vanilla JavaScript IoC container implementation.",
+	"description": "A lightweight Vanilla JavaScript Dependency Injection implementation with lifecycles.",
 	"main": "./lib/dizy.js",
 	"module": "./lib/dizy-esm.js",
 	"browser": "./lib/dizy-esm.js",
