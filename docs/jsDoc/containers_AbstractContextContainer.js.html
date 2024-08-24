@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: containers/AbstractContextContainer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: containers/AbstractContextContainer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {
+	getArgumentDefaultValue,
+	getBaseClass,
+	getClassConstructorArgsNames,
+	getFunctionArgsNames,
+	parseType,
+} from "../../ReflectionJs/index.js";
+// eslint-disable-next-line no-unused-vars
+import DIClazz from "../DIClazz.js";
+import { DIObjectConfig } from "../DIObjectConfig.js";
+import DependencyLoopError from "../errors/DependencyLoopError.js";
+import InvalidAbstractContextConfig from "../errors/InvalidAbstractContextConfig.js";
+import InvalidDIObjectArgDefaultValue from "../errors/InvalidDIObjectArgDefaultValue.js";
+import InvalidDIObjectArgumentName from "../errors/InvalidDIObjectArgumentName.js";
+import NotAllowedDIObjectType from "../errors/NotAllowDIObjectType.js";
+import AbstractDIContainer from "./AbstractDIContainer.js";
+import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
+// eslint-disable-next-line no-unused-vars
+import DependencyTree from "./helpers/DependencyTree.js";
+import DependencyTreeFactory from "./helpers/DependencyTreeFactory.js";
+// eslint-disable-next-line no-unused-vars
+import FunctionWrapper from "../wrappers/FunctionWrapper.js";
+
+// class DIObjectHasInvalidName extends Error {
+// 	constructor(name, contextName) {
+// 		const message = `DI Object has invalid name { ${name} }. Rename this DI object in ${contextName} context config.`;
+// 		super(message);
+// 		this.name = "DI Object's name is invalid";
+// 	}
+// }
+
+// class DIObjectHasInvalidLifecycleIdentifier extends Error {
+// 	constructor(lifecycleId, contextName) {
+// 		const message = `DI Object has invalid lifecycle identifier { ${lifecycleId} }. Change this DI object in ${contextName} context config.`;
+// 		super(message);
+// 		this.name = "DI Object's lifecycle identifier is invalid";
+// 	}
+// }
+
+// class DIConfigHasObjectsWithRepeatedNames extends Error {
+//     constructor(names, contextName) {
+//         const message = `There are DI objects with the same names { ${names.join(', ')} } in ${contextName} context config.`;
+//         super(message);
+//         this.name = "DI Config has objects with repeated names";
+//     }
+// }
+
+class DerivedClassConstructorArgsError extends Error {
+	constructor(derivedClassName, baseClassName) {
+		const message = `The number of constructor arguments in the derived class ${derivedClassName} must be >= than the number of
+            constructor arguments of its base class ${baseClassName}.`;
+		super(message);
+		this.name = "Derived class constructor args count error";
+	}
+}
+
+/** Class representing an error thrown when child of di context isn't an instance of AbstractContextContainer.
+ * @class
+ * @extends Error
+ */
+class InvalidContextChild extends Error {
+	constructor() {
+		super("Invalid context child. Child must be an instance of AbstractContextContainer or it's derived class, null or undefined.");
+	}
+}
+
+/** Abstract Class for context - AbstractContextContainer. It takes config and generates dependency trees, validate it, create
+ * @class
+ * @abstract
+ * @extends AbstractDIContainer
+ *
+ * @property {DependencyTree[]} classTreeList - list of di objects dependency tree.
+ * @property {Map} scopes - Map of Simple DI Containers, like SingletoneContainer, SessionContainer, DemandedFactory.
+//  *
+//  * @property {boolean} contextReady - Is context ready for work?
+//  * @private
+//  *
+//  * @property {DIClazz[]} clazzes - List of DIObjectClazz.
+//  * @private
+//  *
+//  * @property {Map&lt;AbstractContextContainer>} - Map of AbstractContextContainer.
+//  * @private
+ */
+class AbstractContextContainer extends AbstractDIContainer {
+	/**
+	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
+	 * @param {string} [name=""] - name of context
+	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
+	 */
+	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
+		super(parent, []);
+		this.config = config;
+		this.name = name;
+		this.#keyFactory = keyFactory;
+	}
+
+	#contextReady = false;
+
+	#parent;
+	#keyFactory;
+	#clazzes = [];
+	#children = new Map();
+
+	classTreeList = [];
+
+	scopes = new Map();
+
+	/** Init context container: validate config, define classTreeList, create and init scopes and children.
+	 * @public
+	 */
+	init() {
+		// this.#validateDIConfig();
+		if (this.#contextReady) return;
+		this.classTreeList = [];
+		this.#initClazzes();
+		this.#validateObjectsArgsNames();
+		this.#validateDependencyGraph();
+		this.#initClassTreeList();
+		this.classTreeList.sort((a, b) => {
+			return a.baseNode.constructor.args.length - b.baseNode.constructor.args.length;
+		});
+		this._createScopes();
+		this._initScopes();
+		this.#children.forEach((child) => {
+			if (child.init) {
+				child.init();
+			}
+		});
+		this.#contextReady = true;
+	}
+
+	/** Init clazzes
+	 * @private
+	 */
+	#initClazzes() {
+		this.#clazzes = this.config.map(this.#diClazzFromDIObjectConfig.bind(this));
+	}
+
+	/** Returns DIClazz created from DIObjectConfig
+	 * @private
+	 *
+	 * @param {DIObjectConfig} containerObject - config of di object like SingletoneConfig, SessionConfig or DemandedConfig
+	 * @returns {DIClazz}
+	 */
+	#diClazzFromDIObjectConfig(containerObject) {
+		const objName = typeof containerObject.name === "symbol" ? Symbol.keyFor(containerObject.name) : containerObject.name;
+		const typeOfContainerObject = parseType(containerObject.type);
+		if (typeOfContainerObject !== "class" &amp;&amp; typeOfContainerObject !== "function" &amp;&amp; typeOfContainerObject !== "function class") {
+			throw new NotAllowedDIObjectType(containerObject.type);
+		}
+		const isClass = typeOfContainerObject === "class" || typeOfContainerObject === "function class";
+		const constructorArgs =
+			typeOfContainerObject === "class"
+				? { args: getClassConstructorArgsNames(containerObject.type).args }
+				: { args: getFunctionArgsNames(containerObject.type).args };
+		const constructor = {
+			...constructorArgs,
+			args: constructorArgs.args.map((arg) => {
+				const defaultValue = getArgumentDefaultValue(arg);
+				if (defaultValue &amp;&amp; defaultValue.value) {
+					const obj = this.config.find((cls) => cls.type.name === defaultValue.value);
+					if (!obj) {
+						throw new InvalidDIObjectArgDefaultValue(containerObject.name, defaultValue.name, defaultValue.value);
+					}
+					return typeof obj.name === "symbol" ? Symbol.keyFor(obj.name) : obj.name;
+				}
+				return arg;
+			}),
+		};
+		return new DIClazz(
+			this.#keyFactory.createKey(this, objName, containerObject.lifecycle, isClass),
+			objName,
+			containerObject.type,
+			isClass,
+			containerObject.lifecycle,
+			constructor,
+		);
+		// ToDo Правила жизненных циклов
+	}
+
+	/** Add new di object to existed context
+	 * @param {DIObjectConfig} diObjectConfig - config of new di object
+	 * @example &lt;caption>Usage of addDIObject.&lt;/caption>
+	 * // returns tree
+	 * context.addDIObject(SingletoneConfig(...));
+	 * @returns {DependencyTree}
+	 */
+	addDIObject(diObjectConfig) {
+		if (!(diObjectConfig instanceof DIObjectConfig)) {
+			throw new InvalidAbstractContextConfig();
+		}
+		this.config.push(diObjectConfig);
+		const diObjectClazz = this.#diClazzFromDIObjectConfig(diObjectConfig);
+		this.#clazzes.push(diObjectClazz);
+		const tree = DependencyTreeFactory.createDependencyTree(diObjectClazz, this.#clazzes);
+		this.classTreeList.push(tree);
+		return tree;
+	}
+
+	/** Init classTreeList prop with DependencyTreeFactory
+	 * @private
+	 */
+	#initClassTreeList() {
+		this.classTreeList = this.#clazzes.map((clazz) => DependencyTreeFactory.createDependencyTree(clazz, this.#clazzes));
+	}
+
+	/** Create and add scopes to AbstractContextContainer.#scopes
+	 * @protected
+	 */
+	_createScopes() {}
+
+	/**
+	 * @protected
+	 */
+	_initScopes() {}
+
+	/** Returns `true` if context has an instance of di object with specified name.
+	 * @public
+	 * @param {string} name - name of di object from this context
+	 * @returns {boolean}
+	 */
+	// eslint-disable-next-line no-unused-vars
+	hasInstance(name) {}
+
+	/** Get an instance of di object with specified name and lifecycleId.
+	 * @public
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @param {number} [lifecycleId] - id of Lifecycle
+	 * @returns {Object|FunctionWrapper|undefined}
+	 */
+	// eslint-disable-next-line no-unused-vars
+	getInstance(name, lifecycleId) {}
+
+	/** Find dependency tree by name and lifecycle id of di object.
+	 * @protected
+	 * @param {string|symbol|Function} name - name of di object
+	 * @param {number} [lifecycleId] - di object lifecycle id
+	 * @returns {DependencyTree|undefined}
+	 */
+	_findClassTree(name, lifecycleId) {
+		let findCallback;
+		switch (typeof name) {
+			case "string":
+				findCallback = (cls) => cls.baseNode.name === name;
+				break;
+			case "symbol":
+				findCallback = (cls) => cls.baseNode.name === Symbol.keyFor(name);
+				break;
+			default:
+				findCallback = (cls) => cls.baseNode.type.name === name.name;
+				break;
+		}
+		let clazz;
+		if (lifecycleId !== undefined) {
+			clazz = [...this.classTreeList].filter((cls) => cls.baseNode.lifecycle.id === lifecycleId).find(findCallback);
+		} else {
+			// find first class by key in order from Persistent to Demanded
+			clazz = [...this.classTreeList].sort((a, b) => a.baseNode.lifecycle.id - b.baseNode.lifecycle.id).find(findCallback);
+		}
+		if (!clazz) {
+			return undefined;
+			// throw new HasNoDIObjectWithKey(typeof name !== 'string' ? name.name : name, this.name);
+		}
+		return clazz;
+	}
+
+	/** Returns `true` if type of di object with specified key is the same as 'type' argument.
+	 * @abstract
+	 * @param {string|symbol} key - 'key' of di object
+	 * @param {any} type - type of di object
+	 * @returns {boolean}
+	 */
+	// eslint-disable-next-line no-unused-vars
+	typeMatch(key, type) {
+		// is DI object with key instance of type
+	}
+
+	/** Get parent DIContainer.
+	 * @public
+	 * @returns {AbstractContextContainer|null}
+	 */
+	getParent() {
+		return this.#parent;
+	}
+
+	/** Set parent of this context and add this context as a child to parent.
+	 * @public
+	 * @param {AbstractContextContainer} parent
+	 */
+	setParent(parent) {
+		if (parent instanceof AbstractContextContainer) {
+			if (parent.getChildren().has(this.name)) {
+				throw new Error("Parent already has this context as a child.");
+			}
+			this.#parent = parent;
+			parent.addChild(this);
+		}
+	}
+
+	/** Removes reference to parent.
+	 * @protected
+	 */
+	_removeParent() {
+		this.#parent = null;
+	}
+
+	/** Get di object instance from child context.
+	 * @protected
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @param {number} [lifecycleId] - id of Lifecycle
+	 * @returns {Object|FunctionWrapper|undefined}
+	 */
+	_getChildInstance(name, lifecycleId) {
+		let instance;
+		const childContext = [...this.#children.values()].find((context) => {
+			instance = context.getInstance(name, lifecycleId);
+			return instance !== undefined;
+		});
+		return childContext ? instance : undefined;
+	}
+
+	/** Get children of context.
+	 * @public
+	 * @returns {Map&lt;string, AbstractContextContainer>}
+	 */
+	getChildren() {
+		return this.#children;
+	}
+
+	/** Add child context.
+	 * @public
+	 * @param {AbstractContextContainer} childContext
+	 */
+	addChild(childContext) {
+		if (!(childContext instanceof AbstractContextContainer)) {
+			throw new InvalidContextChild();
+		}
+		this.#children.set(childContext.name, childContext);
+	}
+
+	/** Removes child context by it's name.
+	 * @public
+	 * @param {string} childName - name of child context
+	 */
+	deleteChild(childName) {
+		if (!this.#children.has(childName)) {
+			return;
+		}
+		this.#children.get(childName)._removeParent();
+		this.#children.delete(childName);
+	}
+
+	/** Get scope by lifecycle id.
+	 * @abstract
+	 */
+	// eslint-disable-next-line no-unused-vars
+	getScope(lifecycleId) {}
+
+	/** Filter dependency tree list by lifecycle id.
+	 * @public
+	 * @param {number} lifecycleId
+	 * @returns {DependencyTree[]}
+	 */
+	filterClassesByLifecycle(lifecycleId) {
+		return this.classTreeList.filter((cls) => cls.baseNode.lifecycle.id === lifecycleId);
+	}
+
+	// eslint-disable-next-line no-unused-vars
+	#validateDIConfig(config) {
+		// Check if there are objects with invalid name
+		// !name !== true || typeof name === 'string'
+		// if (!Array.isArray(config) || config.find(c => !(c instanceof DIObjectConfig))) {
+		//     throw new InvalidContextConfig();
+		// }
+		// const objectWithInvalidName = config.find(({ name }) => !name === true || !(typeof name === 'string' || typeof name === 'symbol'));
+		// if (objectWithInvalidName) {
+		//     throw new DIObjectHasInvalidName(objectWithInvalidName.name, this.name);
+		// }
+		// Accept repeated names *, if these objects have other lifecycle
+		// Check if there are objects with the same names
+		// const configSet = new Set(this.config.map((objectConfig) => objectConfig.name));
+		// if (this.config.length !== configSet.size) {
+		//     const objectsByNames = Object.fromEntries(Array.from(configSet.values()).map(key => ([
+		//         key,
+		//         this.config.filter((objectConfig) => objectConfig.name === key),
+		//     ])));
+		//     const objectsWithRepeatedNames = Object.entries(objectsByNames).filter(([name, items]) => items.length > 1);
+		//     throw new DIConfigHasObjectsWithRepeatedNames(objectsWithRepeatedNames.map(obj => obj[0]), this.name);
+		// }
+		// Check object lifecycle
+		// Change this conditions after Lifecycle class will be defined.
+		// lifecycle prop must be an instance of Lifecycle (it's checked in DIObjectConfig constructor)
+		// !!! now we don't need to registrate id in LifecycleEnum, because it's done in Lifecycle's constructor
+		// const objectWithInvalidLifecycle = this.config.find(({ lifecycle }) => {
+		//     return !(lifecycle instanceof Lifecycle)
+		//         || !Object.values(LifecycleEnum).find(v => v === lifecycle.id);
+		// });
+		// if (objectWithInvalidLifecycle) {
+		//     throw new DIObjectHasInvalidLifecycleIdentifier(objectWithInvalidLifecycle.lifecycle.id, this.name);
+		// }
+		// Check Inheritance Hierarchy
+		// this.config.forEach((clazz) => this.#validateInheritanceHierarchy(clazz.type));
+	}
+
+	#validateObjectsArgsNames() {
+		const argsSet = new Set();
+		this.#clazzes.forEach((cls) =>
+			cls.constructor.args.forEach((arg) =>
+				argsSet.add({
+					name: arg,
+					place: cls.name,
+				}),
+			),
+		);
+		argsSet.forEach((arg) => {
+			const cls = this.#clazzes.find((elem) => elem.name === arg.name);
+			if (cls === undefined) {
+				throw new InvalidDIObjectArgumentName(arg.place, arg.name);
+			}
+		});
+	}
+
+	#validateInheritanceHierarchy(clazz) {
+		// check inheritance existence
+		// if base class exist and it is not an Object Class,
+		//    check if base class is a part of this di context
+		//      check if constructor arguments count &lt;= derived class constructor args count and return to beggining,
+		//			otherwise throw an exception
+		// else return true
+		if (parseType(clazz) !== "class") return true;
+		const baseClass = getBaseClass(clazz);
+		const isAnotherDIObject = this.config.findIndex((objConfig) => objConfig.type.name === baseClass.name) !== -1;
+		if (baseClass.name !== "Object") {
+			if (isAnotherDIObject) {
+				const clsConstructorArgs = getClassConstructorArgsNames(clazz).args;
+				const baseClsConstructorArgs = getClassConstructorArgsNames(baseClass).args;
+				if (clsConstructorArgs.length &lt; baseClsConstructorArgs.length) {
+					throw new DerivedClassConstructorArgsError(clazz.name, baseClass.name);
+				}
+			}
+			return this.#validateInheritanceHierarchy(baseClass);
+		} else {
+			return true;
+		}
+	}
+
+	#validateDependencyGraph() {
+		this.#clazzes.forEach((cls) => {
+			cls.constructor.args.forEach((arg) => {
+				this.#findDependencyLoop([cls.name, arg], arg);
+			});
+		});
+		return true;
+	}
+
+	#findDependencyLoop(depsList = [], argName) {
+		if (this.#clazzes.length === 0) return;
+		if (argName === undefined) argName = this.#clazzes[0].name;
+		const cls = this.#clazzes.find((cls) => cls.name === argName);
+		cls.constructor.args.forEach((elem) => {
+			if (depsList.includes(elem)) {
+				throw new DependencyLoopError(elem, cls.name);
+			} else {
+				this.#findDependencyLoop([...depsList, elem], elem);
+			}
+		});
+	}
+}
+
+export default AbstractContextContainer;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Dizy.html">Dizy</a></li></ul><h3>Classes</h3><ul><li><a href="AbstractContextContainer.html">AbstractContextContainer</a></li><li><a href="AbstractContextContainerFactory.html">AbstractContextContainerFactory</a></li><li><a href="AbstractDIContainer.html">AbstractDIContainer</a></li><li><a href="ContextContainer.html">ContextContainer</a></li><li><a href="ContextContainerFactory.html">ContextContainerFactory</a></li><li><a href="DIClazz.html">DIClazz</a></li><li><a href="DIContainer.html">DIContainer</a></li><li><a href="DIContainerClassTreeListInvalid.html">DIContainerClassTreeListInvalid</a></li><li><a href="DIObjectConfig.html">DIObjectConfig</a></li><li><a href="DIObjectKey.html">DIObjectKey</a></li><li><a href="DIObjectKeyFactory.html">DIObjectKeyFactory</a></li><li><a href="DemandedConfig.html">DemandedConfig</a></li><li><a href="DemandedFactory.html">DemandedFactory</a></li><li><a href="DemandedLifecycle.html">DemandedLifecycle</a></li><li><a href="DependencyTree.html">DependencyTree</a></li><li><a href="DependencyTreeFactory.html">DependencyTreeFactory</a></li><li><a href="DependencyTreeNode.html">DependencyTreeNode</a></li><li><a href="FunctionWrapper.html">FunctionWrapper</a></li><li><a href="InstanceHelper.html">InstanceHelper</a></li><li><a href="InvalidContextChild.html">InvalidContextChild</a></li><li><a href="InvalidDIObjectLifecycle.html">InvalidDIObjectLifecycle</a></li><li><a href="InvalidDIObjectName.html">InvalidDIObjectName</a></li><li><a href="InvalidDIObjectParent.html">InvalidDIObjectParent</a></li><li><a href="InvalidDIObjectType.html">InvalidDIObjectType</a></li><li><a href="InvalidDIParent.html">InvalidDIParent</a></li><li><a href="Lifecycle.html">Lifecycle</a></li><li><a href="NotImplementedException.html">NotImplementedException</a></li><li><a href="NotUniqueDIObjectKey.html">NotUniqueDIObjectKey</a></li><li><a href="SessionConfig.html">SessionConfig</a></li><li><a href="SessionContainer.html">SessionContainer</a></li><li><a href="SessionLifecycle.html">SessionLifecycle</a></li><li><a href="SimpleContainer.html">SimpleContainer</a></li><li><a href="SingletoneConfig.html">SingletoneConfig</a></li><li><a href="SingletoneContainer.html">SingletoneContainer</a></li><li><a href="SingletoneLifecycle.html">SingletoneLifecycle</a></li><li><a href="UnregisteredDIObjectLifecycle.html">UnregisteredDIObjectLifecycle</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Aug 24 2024 16:08:25 GMT+0300 (Moscow Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

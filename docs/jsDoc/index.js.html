@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import DIClazzModule from "./DIClazz.js";
+import {
+	DIObjectConfig as DIObjectConfigModule,
+	DemandedConfig as DemandedConfigModule,
+	SessionConfig as SessionConfigModule,
+	SingletoneConfig as SingletoneConfigModule,
+} from "./DIObjectConfig.js";
+import DIObjectKeyModule from "./containers/helpers/DIObjectKey.js";
+import ContextContainerModule from "./containers/ContextContainer.js";
+import AbstractContextContainerModule from "./containers/AbstractContextContainer.js";
+import DemandedFactoryModule from "./containers/DemandedFactory.js";
+import SessionContainerModule from "./containers/SessionContainer.js";
+import SimpleContainerModule from "./containers/SimpleContainer.js";
+import SingletoneContainerModule from "./containers/SingletoneContainer.js";
+import DemandedLifecycleModule from "./lifecycle/DemandedLifecycle.js";
+import LifecycleModule from "./lifecycle/Lifecycle.js";
+import SessionLifecycleModule from "./lifecycle/SessionLifecycle.js";
+import SingletoneLifecycleModule from "./lifecycle/SingletoneLifecycle.js";
+import ContextContainerFactoryModule from "./containers/ContextContainerFactory.js";
+import AbstractContextContainerFactoryModule from "./containers/AbstractContextContainerFactory.js";
+
+// const names = {
+//     windowName: Symbol.for('window'),
+//     sideBarName: Symbol.for('sideBar'),
+//     buttonName: 'button',
+//     rectangleName: 'rectangle',
+// };
+
+// const DIConfig = [
+//     // new DemandedConfig(
+//     //     'abstractWindow',
+//     //     AbstractWindow
+//     // ),
+//     new DemandedConfigModule(
+//         names.windowName,
+//         Window,
+//         function () {
+//             console.log(10);
+//         },
+//         function () {
+//             console.log(this.sideBar.button.width);
+//         }
+//     ),
+//     new SingletoneConfigModule(names.sideBarName, SideBar),
+//     new SessionConfigModule(names.buttonName, Button),
+// ];
+
+// const DISecondConfig = [
+//     new SessionConfigModule('dot', dot),
+//     new SessionConfigModule(names.rectangleName, rectangle),
+// ];
+
+// const appContext = new ContextContainerModule(DIConfig, 'app context');
+// const appSecondContext = new ContextContainerModule(DISecondConfig, 'app second context', appContext);
+
+// appContext.init();
+// appSecondContext.init();
+// appContext.getInstance(names.windowName);
+// console.log(appContext.getInstance(names.rectangleName));
+// console.log(appContext.getChildren());
+// const w = appContext.getInstance(Window);
+// console.log(appContext.typeMatch(names.windowName, Window));
+// const aw = appContext.getInstance(AbstractWindow);
+
+// const DIConfig = [
+//     new DIObjectConfig('animal', Animal, LifecycleEnum.Demanded),
+//     new DIObjectConfig('woman', Woman),
+//     new DIObjectConfig('man', Man),
+//     new DIObjectConfig('simple', Simple, LifecycleEnum.Singletone),
+//     new DIObjectConfig('dot', dot),
+//     new DIObjectConfig('line', line),
+//     new DIObjectConfig('square', square),
+//     new DIObjectConfig('rectangle', rectangle),
+// ];
+
+// const appContext = new ContextContainer(DIConfig, 'App Context');
+// appContext.init();
+
+// const simpleObj = appContext.getInstance(Simple);
+// const manObg = appContext.getInstance(Man);
+
+// appContext.getInstance(Simple);
+
+// console.log('This is Simple singletone from AppContext ', simpleObj);
+// console.log('This is Man session from AppContext ', manObg);
+
+// const testPromise = new Promise((resolve, reject) => {
+//     setTimeout(() => resolve(5), 1000);
+// });
+
+// testPromise.then((res) => {
+//     console.log(res);
+//     return res + 5;
+// });
+
+// testPromise.then((res) => {
+//     console.log(res);
+//     return res + 10;
+// })
+
+/** @module Dizy */
+
+/** Dizy type definition
+ * @typedef {Object} Dizy
+ * @property {ContextContainerModule} ContextContainer: ContextContainerModule,
+ * @property {AbstractContextContainerModule} AbstractContextContainer: AbstractContextContainerModule,
+ * @property {DemandedFactoryModule} DemandedFactory: DemandedFactoryModule,
+ * @property {SimpleContainerModule} SimpleContainer: SimpleContainerModule,
+ * @property {SessionContainerModule} SessionContainer: SessionContainerModule,
+ * @property {SingletoneContainerModule} SingletoneContainer: SingletoneContainerModule,
+ * @property {DIObjectKeyModule} DIObjectKey: DIObjectKeyModule,
+ * @property {DemandedConfigModule} DemandedConfig: DemandedConfigModule,
+ * @property {SessionConfigModule} SessionConfig: SessionConfigModule,
+ * @property {SingletoneConfigModule} SingletoneConfig: SingletoneConfigModule,
+ * @property {DIObjectConfigModule} DIObjectConfig: DIObjectConfigModule,
+ * @property {DIClazzModule} DIClazz: DIClazzModule,
+ * @property {DemandedLifecycleModule} DemandedLifecycle: DemandedLifecycleModule,
+ * @property {SingletoneLifecycleModule} SingletoneLifecycle: SingletoneLifecycleModule,
+ * @property {SessionLifecycleModule} SessionLifecycle: SessionLifecycleModule,
+ * @property {LifecycleModule} Lifecycle: LifecycleModule,
+ * @property {ContextContainerFactoryModule} ContextContainerFactory: ContextContainerFactoryModule,
+ * @property {AbstractContextContainerFactoryModule} AbstractContextContainerFactory: AbstractContextContainerFactoryModule,
+ */
+const Dizy = {
+	ContextContainer: ContextContainerModule,
+	AbstractContextContainer: AbstractContextContainerModule,
+	DemandedFactory: DemandedFactoryModule,
+	SimpleContainer: SimpleContainerModule,
+	SessionContainer: SessionContainerModule,
+	SingletoneContainer: SingletoneContainerModule,
+	DIObjectKey: DIObjectKeyModule,
+	DemandedConfig: DemandedConfigModule,
+	SessionConfig: SessionConfigModule,
+	SingletoneConfig: SingletoneConfigModule,
+	DIObjectConfig: DIObjectConfigModule,
+	DIClazz: DIClazzModule,
+	DemandedLifecycle: DemandedLifecycleModule,
+	SingletoneLifecycle: SingletoneLifecycleModule,
+	SessionLifecycle: SessionLifecycleModule,
+	Lifecycle: LifecycleModule,
+	ContextContainerFactory: ContextContainerFactoryModule,
+	AbstractContextContainerFactory: AbstractContextContainerFactoryModule,
+};
+
+module.exports.ContextContainer = Dizy.ContextContainer;
+module.exports.AbstractContextContainer = Dizy.AbstractContextContainer;
+module.exports.ContextContainerFactory = Dizy.ContextContainerFactory;
+module.exports.AbstractContextContainerFactory = Dizy.AbstractContextContainerFactory;
+module.exports.DemandedConfig = Dizy.DemandedConfig;
+module.exports.SessionConfig = Dizy.SessionConfig;
+module.exports.SingletoneConfig = Dizy.SingletoneConfig;
+module.exports.DIObjectConfig = Dizy.DIObjectConfig;
+module.exports.DIClazz = Dizy.DIClazz;
+module.exports.DIObjectKey = Dizy.DIObjectKey;
+module.exports.SingletoneContainer = Dizy.SingletoneContainer;
+module.exports.SimpleContainer = Dizy.SimpleContainer;
+module.exports.DemandedFactory = Dizy.DemandedFactory;
+module.exports.SessionContainer = Dizy.SessionContainer;
+module.exports.DemandedLifecycle = Dizy.DemandedLifecycle;
+module.exports.SingletoneLifecycle = Dizy.SingletoneLifecycle;
+module.exports.SessionLifecycle = Dizy.SessionLifecycle;
+module.exports.Lifecycle = Dizy.Lifecycle;
+
+module.exports = Dizy;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Dizy.html">Dizy</a></li></ul><h3>Classes</h3><ul><li><a href="AbstractContextContainer.html">AbstractContextContainer</a></li><li><a href="AbstractContextContainerFactory.html">AbstractContextContainerFactory</a></li><li><a href="AbstractDIContainer.html">AbstractDIContainer</a></li><li><a href="ContextContainer.html">ContextContainer</a></li><li><a href="ContextContainerFactory.html">ContextContainerFactory</a></li><li><a href="DIClazz.html">DIClazz</a></li><li><a href="DIContainer.html">DIContainer</a></li><li><a href="DIContainerClassTreeListInvalid.html">DIContainerClassTreeListInvalid</a></li><li><a href="DIObjectConfig.html">DIObjectConfig</a></li><li><a href="DIObjectKey.html">DIObjectKey</a></li><li><a href="DIObjectKeyFactory.html">DIObjectKeyFactory</a></li><li><a href="DemandedConfig.html">DemandedConfig</a></li><li><a href="DemandedFactory.html">DemandedFactory</a></li><li><a href="DemandedLifecycle.html">DemandedLifecycle</a></li><li><a href="DependencyTree.html">DependencyTree</a></li><li><a href="DependencyTreeFactory.html">DependencyTreeFactory</a></li><li><a href="DependencyTreeNode.html">DependencyTreeNode</a></li><li><a href="FunctionWrapper.html">FunctionWrapper</a></li><li><a href="InstanceHelper.html">InstanceHelper</a></li><li><a href="InvalidContextChild.html">InvalidContextChild</a></li><li><a href="InvalidDIObjectLifecycle.html">InvalidDIObjectLifecycle</a></li><li><a href="InvalidDIObjectName.html">InvalidDIObjectName</a></li><li><a href="InvalidDIObjectParent.html">InvalidDIObjectParent</a></li><li><a href="InvalidDIObjectType.html">InvalidDIObjectType</a></li><li><a href="InvalidDIParent.html">InvalidDIParent</a></li><li><a href="Lifecycle.html">Lifecycle</a></li><li><a href="NotImplementedException.html">NotImplementedException</a></li><li><a href="NotUniqueDIObjectKey.html">NotUniqueDIObjectKey</a></li><li><a href="SessionConfig.html">SessionConfig</a></li><li><a href="SessionContainer.html">SessionContainer</a></li><li><a href="SessionLifecycle.html">SessionLifecycle</a></li><li><a href="SimpleContainer.html">SimpleContainer</a></li><li><a href="SingletoneConfig.html">SingletoneConfig</a></li><li><a href="SingletoneContainer.html">SingletoneContainer</a></li><li><a href="SingletoneLifecycle.html">SingletoneLifecycle</a></li><li><a href="UnregisteredDIObjectLifecycle.html">UnregisteredDIObjectLifecycle</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Aug 24 2024 16:08:25 GMT+0300 (Moscow Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
