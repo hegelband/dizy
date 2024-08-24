@@ -53,15 +53,15 @@ class CarService {
     }
 
     check() {
-        this.engineService.preassure();
+        this.engineService.pressure();
     }
 }
 
 class EngineService {
     constructor() { }
 
-    preassure() {
-        console.log('Preassure is high!');
+    pressure() {
+        console.log('Pressure is high!');
     }
 }
 
