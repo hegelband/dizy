@@ -1,0 +1,26 @@
+name: "✨ Feature"
+description: Suggest a feature or enhancement to improve Dizy.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Have a question? 👉 [Ask in chat](https://t.me/DizyChat) or [start a new discussion](https://github.com/hegelband/dizy/discussions).
+  - type: textarea
+    id: feature
+    attributes:
+      label: What would you like?
+      description: A clear description of the feature or enhancement wanted in Dizy.
+      placeholder: I'd like to be able to...
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why is this needed?
+      description: Remember, we're not familiar with the app you're testing, so please provide a clear description of why this would be useful to your project.
+      placeholder: I want this because...
+  - type: textarea
+    id: other
+    attributes:
+      label: Other
+      placeholder: Any other details?

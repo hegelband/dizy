@@ -1,0 +1,60 @@
+name: "🐛 Bug report"
+description: Report a bug found while using Dizy.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Have a question? 👉 [Ask in chat](https://t.me/DizyChat) or [start a new discussion](https://github.com/hegelband/dizy/discussions).
+        Issues in the Dizy repo are reserved for bugs and feature requests only.  Questions on how to use Dizy will be closed.
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: Please provide a description including screenshots, stack traces, etc.
+      placeholder: Currently...
+    validations:
+      required: true
+  - type: textarea
+    id: desired-behavior
+    attributes:
+      label: Desired behavior
+      description: Remember, we're not familiar with the app you're testing, so please provide a clear description of what should happen.
+      placeholder: In this situation, Dizy should...
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Test code to reproduce
+      description: Please provide a failing test or repo we can run.
+      placeholder: Here is my failing test code and the app code to run the tests on...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Dizy Version
+      description: What version of Dizy are you running? Look at package.json to see your current version. If possible, please update Dizy to the latest version first.
+      placeholder: ex. 1.0.1
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node version
+      description: What version of node.js are you using to run Dizy?
+      placeholder: ex. v18.12.0
+    validations:
+      required: true
+  - type: textarea
+    id: debug-logs
+    attributes:
+      label: Stack Trace
+      description: Please paste your stack trace here
+      placeholder: Stack trace
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: other
+    attributes:
+      label: Other
+      placeholder: Any other details?
