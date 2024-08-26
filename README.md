@@ -3,7 +3,14 @@
 <p align="center"><em>A lightweight Vanilla JavaScript Dependency Injection implementation with lifecycles.</em></p>
 
 <p align="center">
-	<a href="https://www.npmjs.com/package/dizy" target="__blank"><img src="https://img.shields.io/npm/v/dizy?color=0476bc&label=" alt="NPM version"></a>
+  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
+  ·
+  <a href="https://github.com/hegelband/dizy/issues">Submit an Issue</a>
+  <br>
+</p>
+
+<p align="center">
+	<a href="https://www.npmjs.com/package/dizy" target="__blank"><img src="https://img.shields.io/npm/v/dizy?logo=npm&logoColor=fff&label=NPM+package&color=limegreen" alt="NPM version"></a>
 	<a href="https://codecov.io/gh/kelian9/dizy" >
 		<img src="https://codecov.io/gh/kelian9/dizy/graph/badge.svg?token=0ASEASXF1Q"/>
 	</a>
@@ -69,7 +76,17 @@ class EngineService {
 ```
 <!-- ### Describe DI Config -->
 
-# Abstract
+# Introduction
+
+Welcome to the documentation of <strong>Dizy</strong>! This library provides a powerful and flexible solution for managing dependencies in your applications, making it easier to write maintainable and testable code.
+
+Dependency injection is a design pattern that allows you to decouple components from their dependencies, making them more reusable and easier to test. With our DI library, you can easily inject dependencies into your components, allowing them to focus on their core functionality.
+
+The library offers a simple and intuitive API, making it easy to get started with dependency injection.
+
+In this documentation, we'll cover everything you need to know about using <strong>Dizy</strong>. We'll start with an overview of the library's features and how they can benefit your projects. Then, we'll dive into specific examples of how to use the library in different scenarios. Finally, we'll provide some tips and best practices for working with the library effectively.
+
+Let's get started and explore the power of dependency injection with Dizy!
 
 ## Goals  
 
@@ -106,3 +123,5 @@ class EngineService {
 [**Become a sponsor on patreon**](https://www.patreon.com/Hegelband)  
 
 [**Become a sponsor on opencollective**](https://opencollective.com/hegelband/projects/dizy-js) to get your company in front of future thousands of engaged developers and help us out!
+
+**Love Dizy? Give our repo a star :star: :arrow_up:.**
