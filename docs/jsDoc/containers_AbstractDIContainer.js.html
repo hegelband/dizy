@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: containers/AbstractDIContainer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: containers/AbstractDIContainer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import DIContainer from "./DIContainer.js";
+import DependencyTree from "./helpers/DependencyTree.js";
+
+/** Class representing an error thrown when parent container isn't an instance of AbstractDIContainer.
+ * @class
+ * @extends Error
+ */
+class InvalidDIParent extends Error {
+	constructor() {
+		super("Invalid di parent. Parent must be an instance of AbstractDIContainer or it's derived class, null or undefined.");
+	}
+}
+
+/** Class representing an error thrown when DIContainer 'classTreeList' is invalid.
+ * @class
+ * @extends Error
+ */
+class DIContainerClassTreeListInvalid extends Error {
+	constructor() {
+		super(
+			"DIContainer constructor's argument 'classTreeList' is invalid. " +
+				"Argument 'classTreeList' must be an array of DependencyTree instances",
+		);
+	}
+}
+
+/** Abstract Class AbstractDIContainer
+ * @abstract
+ * @extends {DIContainer}
+ * @property {DependencyTree[]} classTreeList
+ */
+class AbstractDIContainer extends DIContainer {
+	/**
+	 * @abstract
+	 * @param {AbstractDIContainer} parent - parent container
+	 * @param {DependencyTree[]} [classTreeList=[]] - list of di objects dependency tree
+	 */
+	constructor(parent, classTreeList = []) {
+		if (parent !== null &amp;&amp; parent !== undefined &amp;&amp; !(parent instanceof AbstractDIContainer)) {
+			throw new InvalidDIParent();
+		}
+		if (!Array.isArray(classTreeList) || (classTreeList.length &amp;&amp; classTreeList.find((clsTree) => !(clsTree instanceof DependencyTree)))) {
+			throw new DIContainerClassTreeListInvalid();
+		}
+		super();
+		this.classTreeList = classTreeList;
+	}
+}
+
+export default AbstractDIContainer;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Dizy.html">Dizy</a></li></ul><h3>Classes</h3><ul><li><a href="AbstractContextContainer.html">AbstractContextContainer</a></li><li><a href="AbstractContextContainerFactory.html">AbstractContextContainerFactory</a></li><li><a href="AbstractDIContainer.html">AbstractDIContainer</a></li><li><a href="ContextContainer.html">ContextContainer</a></li><li><a href="ContextContainerFactory.html">ContextContainerFactory</a></li><li><a href="DIClazz.html">DIClazz</a></li><li><a href="DIContainer.html">DIContainer</a></li><li><a href="DIContainerClassTreeListInvalid.html">DIContainerClassTreeListInvalid</a></li><li><a href="DIObjectConfig.html">DIObjectConfig</a></li><li><a href="DIObjectKey.html">DIObjectKey</a></li><li><a href="DIObjectKeyFactory.html">DIObjectKeyFactory</a></li><li><a href="DemandedConfig.html">DemandedConfig</a></li><li><a href="DemandedFactory.html">DemandedFactory</a></li><li><a href="DemandedLifecycle.html">DemandedLifecycle</a></li><li><a href="DependencyTree.html">DependencyTree</a></li><li><a href="DependencyTreeFactory.html">DependencyTreeFactory</a></li><li><a href="DependencyTreeNode.html">DependencyTreeNode</a></li><li><a href="FunctionWrapper.html">FunctionWrapper</a></li><li><a href="InstanceHelper.html">InstanceHelper</a></li><li><a href="InvalidContextChild.html">InvalidContextChild</a></li><li><a href="InvalidDIObjectLifecycle.html">InvalidDIObjectLifecycle</a></li><li><a href="InvalidDIObjectName.html">InvalidDIObjectName</a></li><li><a href="InvalidDIObjectParent.html">InvalidDIObjectParent</a></li><li><a href="InvalidDIObjectType.html">InvalidDIObjectType</a></li><li><a href="InvalidDIParent.html">InvalidDIParent</a></li><li><a href="Lifecycle.html">Lifecycle</a></li><li><a href="NotImplementedException.html">NotImplementedException</a></li><li><a href="NotUniqueDIObjectKey.html">NotUniqueDIObjectKey</a></li><li><a href="SessionConfig.html">SessionConfig</a></li><li><a href="SessionContainer.html">SessionContainer</a></li><li><a href="SessionLifecycle.html">SessionLifecycle</a></li><li><a href="SimpleContainer.html">SimpleContainer</a></li><li><a href="SingletoneConfig.html">SingletoneConfig</a></li><li><a href="SingletoneContainer.html">SingletoneContainer</a></li><li><a href="SingletoneLifecycle.html">SingletoneLifecycle</a></li><li><a href="UnregisteredDIObjectLifecycle.html">UnregisteredDIObjectLifecycle</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Aug 24 2024 16:45:32 GMT+0300 (Moscow Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

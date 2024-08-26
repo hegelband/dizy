@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: containers/DemandedFactory.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: containers/DemandedFactory.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import LifecycleEnum from "../constants/LifecycleEnum.js";
+import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
+// eslint-disable-next-line no-unused-vars
+import FunctionWrapper from "../wrappers/FunctionWrapper.js";
+// import deepEqual from "../utils/deepEqual.js";
+import AbstractContextContainer from "./AbstractContextContainer.js";
+import DependencyTree from "./helpers/DependencyTree.js";
+// eslint-disable-next-line no-unused-vars
+import DIObjectKey from "./helpers/DIObjectKey.js";
+import InstanceHelper from "./helpers/InstanceHelper.js";
+
+class InvalidDemandedFactoryParent extends Error {
+	constructor() {
+		super(
+			"Invalid demanded factory parent. " +
+				"Parent must be an instance of AbstractContextContainer or it's derived class, null or undefined.",
+		);
+	}
+}
+
+class DemandedFactoryClassTreeListInvalid extends Error {
+	constructor() {
+		super(
+			"DemandedFactory constructor's argument 'classTreeList' is invalid. " +
+				"Argument 'classTreeList' must be an array of DependencyTree instances",
+		);
+	}
+}
+
+/** Class representing a DI objects factory for objects with demanded lifecycle
+ * @class
+ */
+class DemandedFactory {
+	/**
+	 *
+	 * @param {AbstractContextContainer} parent - parent container
+	 * @param {DependencyTree[]} [classTreeList=[]] - list of di objects dependency tree
+	 */
+	constructor(parent, classTreeList = []) {
+		if (!(parent instanceof AbstractContextContainer)) {
+			throw new InvalidDemandedFactoryParent();
+		}
+		if (!Array.isArray(classTreeList) || (classTreeList.length &amp;&amp; classTreeList.find((clsTree) => !(clsTree instanceof DependencyTree)))) {
+			throw new DemandedFactoryClassTreeListInvalid();
+		}
+		const classWithInvalidLifecycle = classTreeList.find((cls) => cls.baseNode.lifecycle.id !== LifecycleEnum.Demanded);
+		if (classWithInvalidLifecycle) {
+			throw new ContainerHasClassWithInvalidLifecycle("Demanded", classWithInvalidLifecycle);
+		}
+		this.classTreeList = classTreeList;
+		this.#parent = parent;
+	}
+
+	#parent;
+
+	#buildInstance(clazzTree) {
+		const argumentValues = [];
+		if (clazzTree.baseNode.constructor.args.length > 0) {
+			clazzTree.baseNode.constructor.args.forEach((arg) => {
+				const argClazz = this.getParent().classTreeList.find((clsTree) => clsTree.baseNode.name === arg);
+				const existedInstance =
+					argClazz.baseNode.lifecycle.id !== LifecycleEnum.Demanded
+						? this.getParent().getInstance(argClazz.baseNode.name, argClazz.baseNode.lifecycle.id, true)
+						: undefined;
+				if (existedInstance) {
+					return argumentValues.push(existedInstance);
+				}
+				argumentValues.push(this.createInstance(argClazz.baseNode.key));
+			});
+		}
+		clazzTree.baseNode.lifecycle.beforeCreate();
+		const instance = InstanceHelper.createInstance(clazzTree.baseNode, argumentValues);
+		clazzTree.baseNode.lifecycle.afterCreate.bind(instance)();
+		return instance;
+	}
+
+	/** Adds new di object
+	 * @public
+	 * @param {DependencyTree} diObjectClazzTree
+	 */
+	addDIObject(diObjectClazzTree) {
+		if (diObjectClazzTree.baseNode.lifecycle.id !== LifecycleEnum.Demanded) {
+			throw new ContainerHasClassWithInvalidLifecycle("Demanded", diObjectClazzTree);
+		}
+		this.classTreeList.push(diObjectClazzTree);
+	}
+
+	/** Creates new instance of di object
+	 *
+	 * @param {DIObjectKey} key
+	 * @returns {Object|FunctionWrapper}
+	 */
+	createInstance(key) {
+		// create new instance and add it in Map
+		// const clazz = this.classTreeList.find(cls => deepEqual(Symbol.keyFor(cls.baseNode.key.key), Symbol.keyFor(key.key)));
+		const clazz = this.classTreeList.find((cls) => cls.baseNode.key.key === key.key);
+		if (!clazz) {
+			return undefined;
+		}
+		return this.#buildInstance(clazz);
+	}
+
+	/** Returns context that's a parent container of this SessionContainer
+	 *
+	 * @returns {ContextContainer}
+	 */
+	getParent() {
+		return this.#parent;
+	}
+}
+
+export default DemandedFactory;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Dizy.html">Dizy</a></li></ul><h3>Classes</h3><ul><li><a href="AbstractContextContainer.html">AbstractContextContainer</a></li><li><a href="AbstractContextContainerFactory.html">AbstractContextContainerFactory</a></li><li><a href="AbstractDIContainer.html">AbstractDIContainer</a></li><li><a href="ContextContainer.html">ContextContainer</a></li><li><a href="ContextContainerFactory.html">ContextContainerFactory</a></li><li><a href="DIClazz.html">DIClazz</a></li><li><a href="DIContainer.html">DIContainer</a></li><li><a href="DIContainerClassTreeListInvalid.html">DIContainerClassTreeListInvalid</a></li><li><a href="DIObjectConfig.html">DIObjectConfig</a></li><li><a href="DIObjectKey.html">DIObjectKey</a></li><li><a href="DIObjectKeyFactory.html">DIObjectKeyFactory</a></li><li><a href="DemandedConfig.html">DemandedConfig</a></li><li><a href="DemandedFactory.html">DemandedFactory</a></li><li><a href="DemandedLifecycle.html">DemandedLifecycle</a></li><li><a href="DependencyTree.html">DependencyTree</a></li><li><a href="DependencyTreeFactory.html">DependencyTreeFactory</a></li><li><a href="DependencyTreeNode.html">DependencyTreeNode</a></li><li><a href="FunctionWrapper.html">FunctionWrapper</a></li><li><a href="InstanceHelper.html">InstanceHelper</a></li><li><a href="InvalidContextChild.html">InvalidContextChild</a></li><li><a href="InvalidDIObjectLifecycle.html">InvalidDIObjectLifecycle</a></li><li><a href="InvalidDIObjectName.html">InvalidDIObjectName</a></li><li><a href="InvalidDIObjectParent.html">InvalidDIObjectParent</a></li><li><a href="InvalidDIObjectType.html">InvalidDIObjectType</a></li><li><a href="InvalidDIParent.html">InvalidDIParent</a></li><li><a href="Lifecycle.html">Lifecycle</a></li><li><a href="NotImplementedException.html">NotImplementedException</a></li><li><a href="NotUniqueDIObjectKey.html">NotUniqueDIObjectKey</a></li><li><a href="SessionConfig.html">SessionConfig</a></li><li><a href="SessionContainer.html">SessionContainer</a></li><li><a href="SessionLifecycle.html">SessionLifecycle</a></li><li><a href="SimpleContainer.html">SimpleContainer</a></li><li><a href="SingletoneConfig.html">SingletoneConfig</a></li><li><a href="SingletoneContainer.html">SingletoneContainer</a></li><li><a href="SingletoneLifecycle.html">SingletoneLifecycle</a></li><li><a href="UnregisteredDIObjectLifecycle.html">UnregisteredDIObjectLifecycle</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Aug 24 2024 16:45:32 GMT+0300 (Moscow Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

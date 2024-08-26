@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: containers/ContextContainer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: containers/ContextContainer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import AbstractContextContainer from "./AbstractContextContainer.js";
+import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
+import SessionContainer from "./SessionContainer.js";
+import SingletoneContainer from "./SingletoneContainer.js";
+import DemandedFactory from "./DemandedFactory.js";
+import LifecycleEnum from "../constants/LifecycleEnum.js";
+// eslint-disable-next-line no-unused-vars
+import { DemandedConfig, DIObjectConfig, SessionConfig, SingletoneConfig } from "../DIObjectConfig.js";
+
+/** Class for context - ContextContainer.
+ * It takes config and generates dependency trees, validates it, creates scopes and allow to get instances
+ * @class
+ * @extends AbstractContextContainer
+ */
+class ContextContainer extends AbstractContextContainer {
+	/**
+	 *
+	 * @param {DIObjectConfig[]} [config=[]]
+	 * @param {string} [name=""]
+	 * @param {ContextContainer} [parent=null]
+	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()]
+	 */
+	constructor(config = [], name = "", parent = null, keyFactory = new DIObjectKeyFactory()) {
+		super(config, name, parent, keyFactory);
+		// this.#parent = parent;
+		// this.#keyFactory = keyFactory;
+	}
+
+	// #parent;
+	// #keyFactory;
+
+	/** Creates all needed scopes for this context by lifecycles.
+	 * @protected
+	 */
+	_createScopes() {
+		// sort scopes initialization order by desc of lifecycle id (order: Demanded -> Singletone -> Session -> Persistent)
+		const scopesTypes = new Set(this.classTreeList.map((cls) => cls.baseNode.lifecycle).sort((a, b) => b.id - a.id));
+		scopesTypes.forEach((lifecycle) => {
+			switch (lifecycle.id) {
+				case LifecycleEnum.Session:
+					this.scopes.set(lifecycle.id, new SessionContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Session)));
+					break;
+				case LifecycleEnum.Singletone:
+					this.scopes.set(lifecycle.id, new SingletoneContainer(this, this.filterClassesByLifecycle(LifecycleEnum.Singletone)));
+					break;
+				case LifecycleEnum.Demanded:
+					this.scopes.set(lifecycle.id, new DemandedFactory(this, this.filterClassesByLifecycle(LifecycleEnum.Demanded)));
+					break;
+				default:
+					break;
+			}
+		});
+	}
+
+	/** Calls each scope init method if it exists.
+	 * @protected
+	 */
+	_initScopes() {
+		this.scopes.forEach((scope) => {
+			if (scope.init) {
+				scope.init();
+			}
+		});
+	}
+
+	/** Add DI Object to this context
+	 * @public
+	 * @param {SingletoneConfig|SessionConfig|DemandedConfig} diObjectConfig - config of new di object
+	 * @returns {boolean}
+	 */
+	addDIObject(diObjectConfig) {
+		const tree = super.addDIObject(diObjectConfig);
+		if (!this.scopes.has(tree.baseNode.lifecycle.id)) {
+			switch (tree.baseNode.lifecycle.id) {
+				case LifecycleEnum.Session:
+					this.scopes.set(tree.baseNode.lifecycle.id, new SessionContainer(this, [tree]));
+					break;
+				case LifecycleEnum.Singletone:
+					this.scopes.set(tree.baseNode.lifecycle.id, new SingletoneContainer(this, [tree]));
+					break;
+				case LifecycleEnum.Demanded:
+					this.scopes.set(tree.baseNode.lifecycle.id, new DemandedFactory(this, [tree]));
+					break;
+				default:
+					break;
+			}
+		} else {
+			const scope = this.scopes.get(tree.baseNode.lifecycle.id);
+			scope.addDIObject(tree);
+		}
+		return true;
+	}
+
+	/** Returns `true` if context has di object with specified name.
+	 * @public
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @returns {boolean}
+	 */
+	hasDIObject(name) {
+		const classTree = this._findClassTree(name);
+		return classTree !== undefined;
+	}
+
+	/** Returns `true` if context has an instance of di object with specified name.
+	 * @public
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @returns {boolean}
+	 */
+	hasInstance(name) {
+		const classTree = this._findClassTree(name);
+		if (classTree === undefined) return false;
+		const scope = this.getScope(classTree.baseNode.lifecycle.id);
+		if (classTree.baseNode.lifecycle.id === LifecycleEnum.Demanded) return false;
+		return scope.hasInstance(classTree.baseNode.key);
+	}
+
+	/** Get an instance of di object with specified name and lifecycleId.
+	 * @public
+	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @param {number} [lifecycleId] - id of Lifecycle
+	 * @param {boolean} [calledFromScope] - true only if this method is called from scope
+	 * @returns {Object|FunctionWrapper|undefined}
+	 */
+	getInstance(name, lifecycleId, calledFromScope) {
+		const clazz = this._findClassTree(name, lifecycleId);
+		if (clazz === undefined) {
+			if (calledFromScope) return undefined;
+			return this._getChildInstance(name, lifecycleId);
+		}
+		const key = clazz.baseNode.key;
+		const scope = this.getScope(clazz.baseNode.lifecycle.id);
+		if (!scope) {
+			if (calledFromScope) return undefined;
+			return this._getChildInstance(name, lifecycleId);
+		}
+		if (scope instanceof DemandedFactory) return scope.createInstance(key);
+		return calledFromScope ? scope.getInstance(key) : scope.getInstance(key) ?? this._getChildInstance(name, lifecycleId);
+	}
+
+	/** Returns `true` if type of di object with specified key is the same as 'type' argument.
+	 * @public
+	 * @param {string|symbol} key - 'key' of di object
+	 * @param {any} type - type of di object
+	 * @returns {boolean}
+	 */
+	typeMatch(name, type) {
+		// is DI object with name instance of type
+		const clazz = this._findClassTree(name);
+		if (clazz === undefined) {
+			throw new Error("There is no di object with this name.");
+		}
+		return clazz.baseNode.type === type;
+	}
+
+	/** Get scope by lifecycle id.
+	 * @public
+	 * @param {number} lifecycleId - id of Lifecycle
+	 * @returns {SingletoneContainer|SessionContainer|DemandedFactory}
+	 */
+	// eslint-disable-next-line no-unused-vars
+	getScope(lifecycleId) {
+		if (typeof lifecycleId !== "number" || !Object.values(LifecycleEnum).find((v) => v === lifecycleId)) {
+			return null;
+		}
+		return this.scopes.get(lifecycleId);
+	}
+}
+
+export default ContextContainer;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Dizy.html">Dizy</a></li></ul><h3>Classes</h3><ul><li><a href="AbstractContextContainer.html">AbstractContextContainer</a></li><li><a href="AbstractContextContainerFactory.html">AbstractContextContainerFactory</a></li><li><a href="AbstractDIContainer.html">AbstractDIContainer</a></li><li><a href="ContextContainer.html">ContextContainer</a></li><li><a href="ContextContainerFactory.html">ContextContainerFactory</a></li><li><a href="DIClazz.html">DIClazz</a></li><li><a href="DIContainer.html">DIContainer</a></li><li><a href="DIContainerClassTreeListInvalid.html">DIContainerClassTreeListInvalid</a></li><li><a href="DIObjectConfig.html">DIObjectConfig</a></li><li><a href="DIObjectKey.html">DIObjectKey</a></li><li><a href="DIObjectKeyFactory.html">DIObjectKeyFactory</a></li><li><a href="DemandedConfig.html">DemandedConfig</a></li><li><a href="DemandedFactory.html">DemandedFactory</a></li><li><a href="DemandedLifecycle.html">DemandedLifecycle</a></li><li><a href="DependencyTree.html">DependencyTree</a></li><li><a href="DependencyTreeFactory.html">DependencyTreeFactory</a></li><li><a href="DependencyTreeNode.html">DependencyTreeNode</a></li><li><a href="FunctionWrapper.html">FunctionWrapper</a></li><li><a href="InstanceHelper.html">InstanceHelper</a></li><li><a href="InvalidContextChild.html">InvalidContextChild</a></li><li><a href="InvalidDIObjectLifecycle.html">InvalidDIObjectLifecycle</a></li><li><a href="InvalidDIObjectName.html">InvalidDIObjectName</a></li><li><a href="InvalidDIObjectParent.html">InvalidDIObjectParent</a></li><li><a href="InvalidDIObjectType.html">InvalidDIObjectType</a></li><li><a href="InvalidDIParent.html">InvalidDIParent</a></li><li><a href="Lifecycle.html">Lifecycle</a></li><li><a href="NotImplementedException.html">NotImplementedException</a></li><li><a href="NotUniqueDIObjectKey.html">NotUniqueDIObjectKey</a></li><li><a href="SessionConfig.html">SessionConfig</a></li><li><a href="SessionContainer.html">SessionContainer</a></li><li><a href="SessionLifecycle.html">SessionLifecycle</a></li><li><a href="SimpleContainer.html">SimpleContainer</a></li><li><a href="SingletoneConfig.html">SingletoneConfig</a></li><li><a href="SingletoneContainer.html">SingletoneContainer</a></li><li><a href="SingletoneLifecycle.html">SingletoneLifecycle</a></li><li><a href="UnregisteredDIObjectLifecycle.html">UnregisteredDIObjectLifecycle</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Aug 24 2024 16:45:32 GMT+0300 (Moscow Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
