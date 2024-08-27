@@ -6,6 +6,8 @@ import DemandedFactory from "./DemandedFactory.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 // eslint-disable-next-line no-unused-vars
 import { DemandedConfig, DIObjectConfig, SessionConfig, SingletoneConfig } from "../DIObjectConfig.js";
+// eslint-disable-next-line no-unused-vars
+import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 
 /** Class for context - ContextContainer.
  * It takes config and generates dependency trees, validates it, creates scopes and allow to get instances
@@ -114,12 +116,18 @@ class ContextContainer extends AbstractContextContainer {
 		return scope.hasInstance(classTree.baseNode.key);
 	}
 
+	/**
+	 * @template T
+	 * @typedef {T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? FunctionWrapper<T> : any} GetInstanceReturnType<T>
+	 */
+
 	/** Get an instance of di object with specified name and lifecycleId.
 	 * @public
-	 * @param {string|symbol|Function} name - name of di object from this context
+	 * @template {string | symbol | Function} T
+	 * @param {T} name - name of di object from this context
 	 * @param {number} [lifecycleId] - id of Lifecycle
 	 * @param {boolean} [calledFromScope] - true only if this method is called from scope
-	 * @returns {Object|FunctionWrapper|undefined}
+	 * @returns {GetInstanceReturnType<T>}
 	 */
 	getInstance(name, lifecycleId, calledFromScope) {
 		const clazz = this._findClassTree(name, lifecycleId);

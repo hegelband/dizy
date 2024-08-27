@@ -13,7 +13,7 @@ export class AbstractWindow {
   }
 }
 
-class Window extends AbstractWindow {
+class InjectableWindow extends AbstractWindow {
   constructor(sideBar) {
     super(sideBar);
     // comment
@@ -23,4 +23,4 @@ class Window extends AbstractWindow {
   done() {}
 }
 
-export default Window;
+export default InjectableWindow;

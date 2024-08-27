@@ -1,20 +1,28 @@
 import {
 	DemandedConfig as DemandedConfigModule,
+	// eslint-disable-next-line no-unused-vars
+	DIObjectConfig,
 	SessionConfig as SessionConfigModule,
 	SingletoneConfig as SingletoneConfigModule,
 } from "./DIObjectConfig.js";
-import Window from "./modules/Window.js";
-import Button from "./modules/Button.js";
-import SideBar from "./modules/SideBar.js";
-import dot from "./modules/dot.js";
-import rectangle from "./modules/rectangle.js";
-import ContextContainerFactory from "./containers/ContextContainerFactory.js";
+import InjectableWindow from "./modules/Window.js";
+import InjectableButton from "./modules/Button.js";
+import InjectablSideBar from "./modules/SideBar.js";
+// import Injectabldot from "./modules/dot.js";
+// import Injectablrectangle from "./modules/rectangle.js";
+import ContextContainerFactory, {
+	createDIObjectClassConstructor,
+	createDIObjectFunctionConstructor,
+} from "./containers/ContextContainerFactory.js";
+import Injectabledot from "./modules/dot.js";
+import DIObjectKeyFactory from "./containers/helpers/DIObjectKeyFactory.js";
+import { parseType } from "../ReflectionJs/index.js";
 
-class UserForm {
-	constructor(button) {
-		this.button = button;
-	}
-}
+// class UserForm {
+// 	constructor(button) {
+// 		this.button = button;
+// 	}
+// }
 
 const names = {
 	windowName: Symbol.for("window"),
@@ -26,7 +34,7 @@ const names = {
 const DIConfig = [
 	new DemandedConfigModule(
 		names.windowName,
-		Window,
+		InjectableWindow,
 		() => {
 			console.log(10);
 		},
@@ -34,22 +42,40 @@ const DIConfig = [
 			console.log(this.sideBar.button.width);
 		},
 	),
-	new SingletoneConfigModule(names.sideBarName, SideBar),
-	new SessionConfigModule(names.buttonName, Button),
+	new SingletoneConfigModule(names.sideBarName, InjectablSideBar),
+	new SessionConfigModule(names.buttonName, InjectableButton),
+	new SingletoneConfigModule("Injectabledot", Injectabledot),
 ];
 
-const DISecondConfig = [new SessionConfigModule("dot", dot), new SessionConfigModule(names.rectangleName, rectangle)];
+const appContext = ContextContainerFactory.createContainer(
+	DIConfig,
+	"app context",
+	null,
+	new DIObjectKeyFactory(),
+	(name) => name.slice(10),
+	DIConfig.reduce((res, curr) => ({ ...res, [curr.type.name]: res.type }), {}),
+);
 
-const appContext = ContextContainerFactory.createContainer(DIConfig, "app context");
-const appSecondContext = ContextContainerFactory.createContainer(DISecondConfig, "app second context", appContext);
+const getDIObjects = (config, propName, context) =>
+	config.reduce((obj, curr) => {
+		obj[propName(curr.type.name)] =
+			parseType(curr.type) === "class"
+				? createDIObjectClassConstructor(curr.type, context)
+				: createDIObjectFunctionConstructor(curr.type, context);
+		return obj;
+	}, {});
 
-const userFormDIObjectConfig = new SingletoneConfigModule("userForm", UserForm);
+const { Window } = getDIObjects(DIConfig, (name) => name.slice(10), appContext);
 
 appContext.init();
-appSecondContext.init();
-appContext.getInstance(names.windowName);
-console.log(appContext.getInstance(names.rectangleName));
-console.log(appContext.getChildren());
-appContext.getInstance(Window);
-console.log(appContext.addDIObject(userFormDIObjectConfig));
-console.log(appContext.getInstance("userForm"));
+
+appContext.getInstance(Injectabledot);
+
+class SmallWindow {
+	constructor() {
+		return appContext.getInstance("window");
+	}
+}
+
+console.log(new SmallWindow());
+console.log(new Window());

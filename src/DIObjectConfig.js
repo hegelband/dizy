@@ -69,12 +69,13 @@ export class InvalidDIObjectType extends Error {
 /** Abstract Class representint di object config.
  * @class
  * @abstract
+ * @template {Function} T
  */
 export class DIObjectConfig {
 	/**
 	 * @constructor
 	 * @param {string|symbol} name
-	 * @param {callbackType} type
+	 * @param {T} type
 	 * @param {Lifecycle} lifecycle
 	 */
 	constructor(name, type, lifecycle) {

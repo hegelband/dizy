@@ -1,5 +1,5 @@
-const rectangle = (dot) => {
+const Injectablerectangle = (dot) => {
   console.log("Func rectangle with dot ", dot);
 };
 
-export default rectangle;
+export default Injectablerectangle;

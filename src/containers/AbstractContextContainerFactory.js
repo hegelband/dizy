@@ -13,7 +13,7 @@ class AbstractContextContainerFactory {
 	/** Returns new AbstractContextContainer.
 	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
 	 * @param {string} [name=""] - name of context
-	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {AbstractContextContainer} [parent=null] - parent context
 	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
 	 * @returns {AbstractContextContainer}
 	 */
@@ -29,7 +29,7 @@ class AbstractContextContainerFactory {
 	 * @static
 	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
 	 * @param {string} [name=""] - name of context
-	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {AbstractContextContainer} [parent=null] - parent context
 	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
 	 * @returns {boolean}
 	 */
