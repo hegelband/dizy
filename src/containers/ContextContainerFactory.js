@@ -4,6 +4,39 @@ import generateRandomString from "../utils/generateRandomString.js";
 import InvalidContextContainerNameType from "../errors/InvalidContextContainerNameType.js";
 import NotUniqueContextContainerName from "../errors/NotUniqueContextContainerName.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
+// eslint-disable-next-line no-unused-vars
+import { DIObjectConfig } from "../DIObjectConfig.js";
+// import { parseType } from "../../ReflectionJs/index.js";
+
+/**
+ * @template T
+ * @typedef {T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? FunctionWrapper<T> : any} GetInstanceReturnType<T>
+ */
+
+/**
+ * @template {Function} T
+ * @param {T} diObjectType
+ * @param {ContextContainer} ctx
+ * @returns {GetInstanceReturnType<T>}
+ */
+export function createDIObjectClassConstructor(diObjectType, ctx) {
+	return function DIObject() {
+		if (new.target) {
+			return ctx.getInstance(diObjectType);
+		}
+		return new DIObject();
+	};
+}
+
+/**
+ * @template {Function} T
+ * @param {T} diObjectType
+ * @param {ContextContainer} ctx
+ * @returns {GetInstanceReturnType<T>}
+ */
+export function createDIObjectFunctionConstructor(diObjectType, ctx) {
+	return () => ctx.getInstance(diObjectType).call;
+}
 
 /** Class for creation of ContextContainer - ContextContainerFactory.
  *
@@ -22,11 +55,11 @@ class ContextContainerFactory extends AbstractContextContainerFactory {
 		ContextContainerFactory.#names.add(name);
 	}
 
-	/** Returns new AbstractContextContainer.
+	/** Returns new ContextContainer.
 	 * @static
 	 * @param {DIObjectConfig[]} [config=[]] - list of di objects configs
 	 * @param {string} [name=""] - name of context
-	 * @param {AbstractDIContainer} [parent=null] - parent context
+	 * @param {ContextContainer} [parent=null] - parent context
 	 * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
 	 * @returns {ContextContainer}
 	 */
