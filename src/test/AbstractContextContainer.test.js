@@ -24,6 +24,13 @@ describe("AbstractContextContainer", () => {
 		});
 
 		describe("create AbstractContextContainer with invalid config", () => {
+			it(`should throw an error 'Name of Context must be a non empty string.'`, () => {
+				const createAbstractContext = () => factory.createContainer([], null);
+				assert.throws(createAbstractContext, Error, "Name of Context must be a non empty string.");
+			});
+		});
+
+		describe("create AbstractContextContainer with invalid name", () => {
 			it(`should throw an error 'Invalid context config. Config must be an array of DIObjectConfig instances'`, () => {
 				const createAbstractContext = () => factory.createContainer({ notDIObjectConfigArray: true });
 				assert.throws(createAbstractContext, Error, "Invalid context config. Config must be an array of DIObjectConfig instances");
