@@ -1,6 +1,6 @@
 {
 	"name": "dizy",
-	"version": "0.4.7",
+	"version": "0.5.0",
 	"description": "A lightweight Vanilla JavaScript Dependency Injection implementation with lifecycles.",
 	"main": "./lib/dizy.js",
 	"module": "./lib/dizy-esm.js",

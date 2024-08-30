@@ -6,8 +6,6 @@ import DemandedFactory from "./DemandedFactory.js";
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 // eslint-disable-next-line no-unused-vars
 import { DemandedConfig, DIObjectConfig, SessionConfig, SingletoneConfig } from "../DIObjectConfig.js";
-// eslint-disable-next-line no-unused-vars
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 
 /** Class for context - ContextContainer.
  * It takes config and generates dependency trees, validates it, creates scopes and allow to get instances
@@ -118,7 +116,7 @@ class ContextContainer extends AbstractContextContainer {
 
 	/**
 	 * @template T
-	 * @typedef {T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? FunctionWrapper<T> : any} GetInstanceReturnType<T>
+	 * @typedef {T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? T : any} GetInstanceReturnType<T>
 	 */
 
 	/** Get an instance of di object with specified name and lifecycleId.

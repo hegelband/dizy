@@ -18,9 +18,9 @@ declare class DemandedFactory {
     /** Creates new instance of di object
      *
      * @param {DIObjectKey} key
-     * @returns {Object|FunctionWrapper}
+     * @returns {Object|Function}
      */
-    createInstance(key: DIObjectKey): any | FunctionWrapper;
+    createInstance(key: DIObjectKey): any | Function;
     /** Returns context that's a parent container of this SessionContainer
      *
      * @returns {ContextContainer}
@@ -30,5 +30,4 @@ declare class DemandedFactory {
 }
 import DependencyTree from "./helpers/DependencyTree.js";
 import DIObjectKey from "./helpers/DIObjectKey.js";
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 import AbstractContextContainer from "./AbstractContextContainer.js";

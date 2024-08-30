@@ -45,7 +45,7 @@ describe("InstanceHelper", () => {
 			);
 			const funcTreeNode = new DependencyTreeNode(baseClazz, 0, []);
 			const funcWrapper = InstanceHelper.createInstance(funcTreeNode, [{ width: 10 }, { height: 10 }]);
-			assert.equal(funcWrapper.func, K);
+			assert.equal(funcWrapper.name, K.name);
 		});
 	});
 });

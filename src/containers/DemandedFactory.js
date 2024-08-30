@@ -1,7 +1,5 @@
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
-// eslint-disable-next-line no-unused-vars
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 // import deepEqual from "../utils/deepEqual.js";
 import AbstractContextContainer from "./AbstractContextContainer.js";
 import DependencyTree from "./helpers/DependencyTree.js";
@@ -88,7 +86,7 @@ class DemandedFactory {
 	/** Creates new instance of di object
 	 *
 	 * @param {DIObjectKey} key
-	 * @returns {Object|FunctionWrapper}
+	 * @returns {Object|Function}
 	 */
 	createInstance(key) {
 		// create new instance and add it in Map
