@@ -18,9 +18,9 @@ declare class SingletoneContainer extends SimpleContainer {
     /** Adds instance to instancesMap
      * @protected
      * @param {DIObjectKey} key
-     * @param {Object|FunctionWrapper} instance
+     * @param {Object|Function} instance
      */
-    protected _addInstance(key: DIObjectKey, instance: any | FunctionWrapper): void;
+    protected _addInstance(key: DIObjectKey, instance: any | Function): void;
     /** Returns boolean indicating whether an element with the specified key exists or not.
      *
      * @param {DIObjectKey} key
@@ -30,9 +30,9 @@ declare class SingletoneContainer extends SimpleContainer {
     /**
      *
      * @param {DIObjectKey} key
-     * @returns {Object|FunctionWrapper}
+     * @returns {Object|Function}
      */
-    getInstance(key: DIObjectKey): any | FunctionWrapper;
+    getInstance(key: DIObjectKey): any | Function;
     /** Returns context that's a parent container of this SessionContainer
      *
      * @returns {ContextContainer}

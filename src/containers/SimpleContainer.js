@@ -1,5 +1,3 @@
-// eslint-disable-next-line no-unused-vars
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 import AbstractContextContainer from "./AbstractContextContainer.js";
 import AbstractDIContainer from "./AbstractDIContainer.js";
 // eslint-disable-next-line no-unused-vars
@@ -35,7 +33,7 @@ class SimpleContainer extends AbstractDIContainer {
 	/** Returns new instance of di object.
 	 * @protected
 	 * @param {*} clazzTree
-	 * @returns {Object|FunctionWrapper}
+	 * @returns {Object|Function}
 	 */
 	_buildInstance(clazzTree) {
 		// create new instance and add it in Map

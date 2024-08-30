@@ -47,7 +47,7 @@ class SingletoneContainer extends SimpleContainer {
 	/** Adds instance to instancesMap
 	 * @protected
 	 * @param {DIObjectKey} key
-	 * @param {Object|FunctionWrapper} instance
+	 * @param {Object|Function} instance
 	 */
 	_addInstance(key, instance) {
 		// check that key is valid (there is a classTree node with that key)
@@ -79,7 +79,7 @@ class SingletoneContainer extends SimpleContainer {
 	/**
 	 *
 	 * @param {DIObjectKey} key
-	 * @returns {Object|FunctionWrapper}
+	 * @returns {Object|Function}
 	 */
 	getInstance(key) {
 		// const existed = this.#instances.get(key.key);

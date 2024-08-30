@@ -37,24 +37,25 @@ export class InvalidDIObjectType extends Error {
 /** Abstract Class representint di object config.
  * @class
  * @abstract
+ * @template {Function} T
  */
-export class DIObjectConfig {
+export class DIObjectConfig<T extends Function> {
     /**
      * @constructor
      * @param {string|symbol} name
-     * @param {callbackType} type
+     * @param {T} type
      * @param {Lifecycle} lifecycle
      */
-    constructor(name: string | symbol, type: callbackType, lifecycle: Lifecycle);
+    constructor(name: string | symbol, type: T, lifecycle: Lifecycle);
     name: string | symbol;
-    type: callbackType;
+    type: T;
     lifecycle: Lifecycle;
 }
 /** Class representing a config of di object with demanded lifecycle
  * @class
  * @property {DemandedLifecycle} lifecycle
  */
-export class DemandedConfig extends DIObjectConfig {
+export class DemandedConfig extends DIObjectConfig<any> {
     /**
      *
      * @param {string|symbol} name
@@ -68,7 +69,7 @@ export class DemandedConfig extends DIObjectConfig {
  * @class
  * @property {SingletoneLifecycle} lifecycle
  */
-export class SingletoneConfig extends DIObjectConfig {
+export class SingletoneConfig extends DIObjectConfig<any> {
     /**
      *
      * @param {string|symbol} name
@@ -82,7 +83,7 @@ export class SingletoneConfig extends DIObjectConfig {
  * @class
  * @property {SessionLifecycle} lifecycle
  */
-export class SessionConfig extends DIObjectConfig {
+export class SessionConfig extends DIObjectConfig<any> {
     /**
      *
      * @param {string|symbol} name

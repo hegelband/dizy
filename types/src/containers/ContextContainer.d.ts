@@ -12,7 +12,7 @@ declare class ContextContainer extends AbstractContextContainer {
      * @param {ContextContainer} [parent=null]
      * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()]
      */
-    constructor(config?: DIObjectConfig[], name?: string, parent?: ContextContainer, keyFactory?: DIObjectKeyFactory);
+    constructor(config?: DIObjectConfig<any>[], name?: string, parent?: ContextContainer, keyFactory?: DIObjectKeyFactory);
     /** Add DI Object to this context
      * @public
      * @param {SingletoneConfig|SessionConfig|DemandedConfig} diObjectConfig - config of new di object
@@ -31,14 +31,26 @@ declare class ContextContainer extends AbstractContextContainer {
      * @returns {boolean}
      */
     public hasInstance(name: string | symbol | Function): boolean;
+    /**
+     * @template T
+     * @typedef {T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? T : any} GetInstanceReturnType<T>
+     */
     /** Get an instance of di object with specified name and lifecycleId.
      * @public
-     * @param {string|symbol|Function} name - name of di object from this context
+     * @template {string | symbol | Function} T
+     * @param {T} name - name of di object from this context
      * @param {number} [lifecycleId] - id of Lifecycle
      * @param {boolean} [calledFromScope] - true only if this method is called from scope
-     * @returns {Object|FunctionWrapper|undefined}
+     * @returns {GetInstanceReturnType<T>}
      */
-    public getInstance(name: string | symbol | Function, lifecycleId?: number, calledFromScope?: boolean): any | FunctionWrapper | undefined;
+    public getInstance<T extends string | symbol | Function>(name: T, lifecycleId?: number, calledFromScope?: boolean): T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? T : any;
+    /** Returns a proxy `diObjectType`, that changes constructor (new diObjectType() = context.getInstance(diObjectType))
+     * @public
+     * @template {Function} T
+     * @param {T} diObjectType
+     * @returns {GetInstanceReturnType<T>}
+     */
+    public getDIObjectProxy<T extends Function>(diObjectType: T): T extends abstract new (...args: any[]) => infer P ? P : T extends Function ? T : any;
     /** Returns `true` if type of di object with specified key is the same as 'type' argument.
      * @public
      * @param {string|symbol} key - 'key' of di object

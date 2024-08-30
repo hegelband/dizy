@@ -1,8 +1,6 @@
 import LifecycleEnum from "../constants/LifecycleEnum.js";
 import ContainerHasClassWithInvalidLifecycle from "../errors/ContainerHasClassWithInvalidLifecycle.js";
 // eslint-disable-next-line no-unused-vars
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
-// eslint-disable-next-line no-unused-vars
 import ContextContainer from "./ContextContainer.js";
 import SimpleContainer from "./SimpleContainer.js";
 import DIObjectKey from "./helpers/DIObjectKey.js";
@@ -72,7 +70,7 @@ class SessionContainer extends SimpleContainer {
 	/** Adds instance to instancesMap
 	 * @protected
 	 * @param {DIObjectKey} key
-	 * @param {Object|FunctionWrapper} instance
+	 * @param {Object|Function} instance
 	 */
 	_addInstance(key, instance) {
 		// check that key is valid (there is a classTree node with that key)
@@ -107,7 +105,7 @@ class SessionContainer extends SimpleContainer {
 	/**
 	 *
 	 * @param {DIObjectKey} key
-	 * @returns {Object|FunctionWrapper}
+	 * @returns {Object|Function}
 	 */
 	getInstance(key) {
 		// return this.#instances.get(key.key);

@@ -18,8 +18,6 @@ import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
 // eslint-disable-next-line no-unused-vars
 import DependencyTree from "./helpers/DependencyTree.js";
 import DependencyTreeFactory from "./helpers/DependencyTreeFactory.js";
-// eslint-disable-next-line no-unused-vars
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 
 // class DIObjectHasInvalidName extends Error {
 // 	constructor(name, contextName) {
@@ -227,7 +225,7 @@ class AbstractContextContainer extends AbstractDIContainer {
 	 * @public
 	 * @param {string|symbol|Function} name - name of di object from this context
 	 * @param {number} [lifecycleId] - id of Lifecycle
-	 * @returns {Object|FunctionWrapper|undefined}
+	 * @returns {Object|Function|undefined}
 	 */
 	// eslint-disable-next-line no-unused-vars
 	getInstance(name, lifecycleId) {}
@@ -309,7 +307,7 @@ class AbstractContextContainer extends AbstractDIContainer {
 	 * @protected
 	 * @param {string|symbol|Function} name - name of di object from this context
 	 * @param {number} [lifecycleId] - id of Lifecycle
-	 * @returns {Object|FunctionWrapper|undefined}
+	 * @returns {Object|Function|undefined}
 	 */
 	_getChildInstance(name, lifecycleId) {
 		let instance;

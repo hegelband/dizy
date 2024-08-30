@@ -45,7 +45,7 @@ export type Dizy = {
     /**
      * : DIObjectConfigModule,
      */
-    DIObjectConfig: DIObjectConfigModule;
+    DIObjectConfig: DIObjectConfigModule<any>;
     /**
      * : DIClazzModule,
      */

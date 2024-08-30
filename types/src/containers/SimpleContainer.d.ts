@@ -14,9 +14,9 @@ declare class SimpleContainer extends AbstractDIContainer {
     /** Returns new instance of di object.
      * @protected
      * @param {*} clazzTree
-     * @returns {Object|FunctionWrapper}
+     * @returns {Object|Function}
      */
-    protected _buildInstance(clazzTree: any): any | FunctionWrapper;
+    protected _buildInstance(clazzTree: any): any | Function;
     /**
      * @protected
      */
@@ -28,6 +28,5 @@ declare class SimpleContainer extends AbstractDIContainer {
     public addDIObject(diObjectClazzTree: DependencyTree): void;
 }
 import AbstractDIContainer from "./AbstractDIContainer.js";
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 import DependencyTree from "./helpers/DependencyTree.js";
 import AbstractContextContainer from "./AbstractContextContainer.js";

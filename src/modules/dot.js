@@ -1,5 +1,7 @@
-const Injectabledot = () => {
-  // console.log('Func dot');
+const Injectabledot = (line) => {
+  console.log('Func dot');
+  line();
+  return 3;
 };
 
 export default Injectabledot;

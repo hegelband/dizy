@@ -23,8 +23,8 @@ declare class AbstractContextContainer extends AbstractDIContainer {
      * @param {AbstractDIContainer} [parent=null] - parent context
      * @param {DIObjectKeyFactory} [keyFactory=new DIObjectKeyFactory()] - Keys Factory
      */
-    constructor(config?: DIObjectConfig[], name?: string, parent?: AbstractDIContainer, keyFactory?: DIObjectKeyFactory);
-    config: DIObjectConfig[];
+    constructor(config?: DIObjectConfig<any>[], name?: string, parent?: AbstractDIContainer, keyFactory?: DIObjectKeyFactory);
+    config: DIObjectConfig<any>[];
     name: string;
     classTreeList: any[];
     scopes: Map<any, any>;
@@ -39,7 +39,7 @@ declare class AbstractContextContainer extends AbstractDIContainer {
      * context.addDIObject(SingletoneConfig(...));
      * @returns {DependencyTree}
      */
-    addDIObject(diObjectConfig: DIObjectConfig): DependencyTree;
+    addDIObject(diObjectConfig: DIObjectConfig<any>): DependencyTree;
     /** Create and add scopes to AbstractContextContainer.#scopes
      * @protected
      */
@@ -58,9 +58,9 @@ declare class AbstractContextContainer extends AbstractDIContainer {
      * @public
      * @param {string|symbol|Function} name - name of di object from this context
      * @param {number} [lifecycleId] - id of Lifecycle
-     * @returns {Object|FunctionWrapper|undefined}
+     * @returns {Object|Function|undefined}
      */
-    public getInstance(name: string | symbol | Function, lifecycleId?: number): any | FunctionWrapper | undefined;
+    public getInstance(name: string | symbol | Function, lifecycleId?: number): any | Function | undefined;
     /** Find dependency tree by name and lifecycle id of di object.
      * @protected
      * @param {string|symbol|Function} name - name of di object
@@ -86,9 +86,9 @@ declare class AbstractContextContainer extends AbstractDIContainer {
      * @protected
      * @param {string|symbol|Function} name - name of di object from this context
      * @param {number} [lifecycleId] - id of Lifecycle
-     * @returns {Object|FunctionWrapper|undefined}
+     * @returns {Object|Function|undefined}
      */
-    protected _getChildInstance(name: string | symbol | Function, lifecycleId?: number): any | FunctionWrapper | undefined;
+    protected _getChildInstance(name: string | symbol | Function, lifecycleId?: number): any | Function | undefined;
     /** Get children of context.
      * @public
      * @returns {Map<string, AbstractContextContainer>}
@@ -119,5 +119,4 @@ declare class AbstractContextContainer extends AbstractDIContainer {
 import AbstractDIContainer from "./AbstractDIContainer.js";
 import { DIObjectConfig } from "../DIObjectConfig.js";
 import DependencyTree from "./helpers/DependencyTree.js";
-import FunctionWrapper from "../wrappers/FunctionWrapper.js";
 import DIObjectKeyFactory from "./helpers/DIObjectKeyFactory.js";
