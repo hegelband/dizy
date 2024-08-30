@@ -80,7 +80,7 @@ class SessionContainer extends SimpleContainer {
 		// delete this rule, because we need to access adding instance from outside
 		if (
 			!this.classTreeList.find((clsTree) => {
-				console.log(clsTree.baseNode.key, key);
+				// console.log(clsTree.baseNode.key, key);
 				return clsTree.baseNode.key.key === key.key;
 			})
 		) {

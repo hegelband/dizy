@@ -58,7 +58,7 @@ class SingletoneContainer extends SimpleContainer {
 		// don't delete this rule, because we don't need to do ServiceLocator
 		if (
 			!this.classTreeList.find((clsTree) => {
-				console.log(clsTree.baseNode.key, key);
+				// console.log(clsTree.baseNode.key, key);
 				return clsTree.baseNode.key.key === key.key;
 			})
 		) {
